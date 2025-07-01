@@ -1,0 +1,36 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>WGRDLE</title>
+  <script src="https://unpkg.com/htmx.org@1.9.2"></script>
+  <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script defer src="script.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 text-gray-900">
+  <div class="max-w-4xl mx-auto p-4" x-data="wgrdleApp">
+    <h1 class="text-4xl font-bold mb-4">🪖 WGRDLE</h1>
+    <p class="mb-4">Guess the Wargame: Red Dragon unit of the day!</p>
+
+    <input type="text" x-model="guess" class="border p-2 w-full mb-2" placeholder="Type unit name..." @keydown.enter="submitGuess()" />
+    <button @click="submitGuess()" class="bg-blue-600 text-white px-4 py-2 rounded">Submit</button>
+
+    <div class="mt-6">
+      <template x-for="(row, rowIndex) in guesses" :key="rowIndex">
+        <div class="grid grid-cols-6 gap-2 mb-2">
+          <template x-for="(stat, key) in row" :key="key">
+            <div :class="{
+                'bg-green-400': stat.match === 'green',
+                'bg-yellow-300': stat.match === 'yellow',
+                'bg-gray-300': stat.match === 'gray'
+              }" class="p-2 rounded text-sm text-center font-mono" x-text="stat.value"></div>
+          </template>
+        </div>
+      </template>
+    </div>
+  </div>
+</body>
+</html>
