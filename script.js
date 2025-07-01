@@ -1,36 +1,55 @@
-
-let unitData = [];
+let units = [];
 let targetUnit = null;
+let flatTarget = null;
 
-document.addEventListener('alpine:init', () => {
-  Alpine.data('wgrdleApp', () => ({
-    guess: '',
-    guesses: [],
-    async init() {
-      const res = await fetch('data/units.json');
-      unitData = await res.json();
+fetch('units.json')
+  .then(res => res.json())
+  .then(data => {
+    units = data.filter(u => u && u.name); // remove nulls
+    targetUnit = units[Math.floor(Math.random() * units.length)];
+    flatTarget = { ...targetUnit, ...targetUnit.weapon };
+    delete flatTarget.weapon;
 
-      // Deterministic "daily" unit based on date hash
-      const day = new Date().toISOString().split('T')[0];
-      const seed = day.split('-').reduce((a, b) => a + parseInt(b), 0);
-      targetUnit = unitData[seed % unitData.length];
-    },
-    submitGuess() {
-      const match = unitData.find(u => u.name.toLowerCase() === this.guess.toLowerCase());
-      if (!match) return;
+    document.getElementById('title').textContent = `Match stats with ${targetUnit.name}`;
 
-      const row = {};
-      ['name', 'country', 'type', 'year', 'cost', 'strength'].forEach(stat => {
-        const guessed = match[stat];
-        const actual = targetUnit[stat];
-        row[stat] = {
-          value: guessed,
-          match: guessed === actual ? 'green' :
-                 (typeof actual === 'number' && Math.abs(guessed - actual) / actual <= 0.1 ? 'yellow' : 'gray')
-        };
-      });
-      this.guesses.push(row);
-      this.guess = '';
+    // Add header row
+    const table = document.getElementById('resultsTable');
+    const headerRow = document.createElement('tr');
+    for (const key in flatTarget) {
+      const th = document.createElement('th');
+      th.textContent = key;
+      headerRow.appendChild(th);
     }
-  }));
+    table.appendChild(headerRow);
+  });
+
+document.getElementById('searchBtn').addEventListener('click', function () {
+  const query = document.getElementById('unitInput').value.toLowerCase();
+  const unit = units.find(u => u && u.name && u.name.toLowerCase() === query);
+
+  if (unit) {
+    const flatUnit = { ...unit, ...unit.weapon };
+    delete flatUnit.weapon;
+
+    const table = document.getElementById('resultsTable');
+    const row = document.createElement('tr');
+
+    for (const key in flatTarget) {
+      const td = document.createElement('td');
+      const guessVal = flatUnit[key];
+      const targetVal = flatTarget[key];
+      td.textContent = guessVal;
+
+      if (
+        guessVal === targetVal ||
+        (typeof guessVal === 'number' && typeof targetVal === 'number' && Math.abs(guessVal - targetVal) < 0.01)
+      ) {
+        td.classList.add('match');
+      }
+
+      row.appendChild(td);
+    }
+
+    table.appendChild(row);
+  }
 });
