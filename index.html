@@ -32,14 +32,33 @@
       background-color: #c8f7c5;
     }
 
+    .close {
+      background-color: #fff3b0;
+    }
+
+    /* yellow for close */
+
+
     /* green for match */
   </style>
 </head>
 
 <body>
   <h1 id="title">Match stats with ...</h1>
-  <input type="text" id="unitInput" placeholder="Enter unit name..." />
+  <div style="position: relative;">
+    <input type="text" id="unitInput" placeholder="Enter unit name..." autocomplete="off" />
+    <div id="autocompleteList" style="
+    position: absolute;
+    background: white;
+    border: 1px solid #ccc;
+    max-height: 200px;
+    overflow-y: auto;
+    width: 300px;
+    z-index: 1000;
+  "></div>
+  </div>
   <button id="searchBtn">Match</button>
+
   <table id="resultsTable"></table>
 
   <script src="script.js"></script>
