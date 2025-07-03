@@ -70,6 +70,13 @@ function isClose(key, guessVal, targetVal, guessUnit, targetUnit) {
     return Math.abs(Number(guessVal) - Number(targetVal)) <= 1;
   }
 
+  if (key == 'price') {
+    if (Number(targetVal) <= 50) {
+      return Math.abs(Number(guessVal) - Number(targetVal)) <= 5;
+    }
+    return Math.abs(Number(guessVal) - Number(targetVal) <= 10);
+  }
+
   if (key === 'country') {
     const gCoal = guessUnit.coalition || [];
     const tCoal = targetUnit.coalition || [];
@@ -101,6 +108,9 @@ function isClose(key, guessVal, targetVal, guessUnit, targetUnit) {
 }
 
 function getTooltip(key, guessVal, targetVal, guessUnit, targetUnit) {
+  if (key == 'price') {
+    return '+-5 if price <= 50, else +-10'
+  }
   if (key.startsWith('weapon') && !key.endsWith('_type')) {
     const typeKey = key + '_type';
     const targetType = targetUnit[typeKey];
@@ -279,9 +289,29 @@ input.addEventListener('input', () => {
 
   currentSuggestions.forEach((match, index) => {
     const div = document.createElement('div');
-    div.textContent = match.name;
+    div.className = 'autocomplete-item';
+    div.style.display = 'flex';
+    div.style.alignItems = 'center';
+    div.style.gap = '0.5rem';
     div.style.padding = '0.5rem';
     div.style.cursor = 'pointer';
+
+    const flagImg = document.createElement('img');
+    const countryFile = match.country.toLowerCase().replace(/\s+/g, '_');
+    flagImg.src = `images/flags/${countryFile}.webp`;
+    flagImg.alt = match.country;
+    flagImg.style.width = '20px';
+    flagImg.style.height = '14px';
+    flagImg.style.objectFit = 'cover';
+    flagImg.style.border = '1px solid #ccc';
+    flagImg.style.borderRadius = '2px';
+
+    const nameSpan = document.createElement('span');
+    nameSpan.textContent = match.name;
+
+    div.appendChild(flagImg);
+    div.appendChild(nameSpan);
+
     div.dataset.index = index;
     div.classList.add('autocomplete-item');
     div.addEventListener('mousedown', () => {
