@@ -3,6 +3,7 @@ let targetUnit = null;
 let flatTarget = null;
 let highlightedIndex = -1;
 let currentSuggestions = [];
+let selectedUnit = null;
 
 
 const closenessSets = {
@@ -74,7 +75,7 @@ function isClose(key, guessVal, targetVal, guessUnit, targetUnit) {
     if (Number(targetVal) <= 50) {
       return Math.abs(Number(guessVal) - Number(targetVal)) <= 5;
     }
-    return Math.abs(Number(guessVal) - Number(targetVal) <= 10);
+    return Math.abs(Number(guessVal) - Number(targetVal)) <= 10;
   }
 
   if (key === 'country') {
@@ -96,7 +97,11 @@ function isClose(key, guessVal, targetVal, guessUnit, targetUnit) {
   if (key === 'categories') {
     const guessSet = new Set(guessVal || []);
     const targetSet = new Set(targetVal || []);
-    return [...guessSet].every(x => targetSet.has(x));
+
+    const isSubset = [...guessSet].every(x => targetSet.has(x));
+    const isEqual = guessSet.size === targetSet.size && isSubset;
+
+    return isSubset && !isEqual                  // no match
   }
 
   const normGuess = normalize(guessVal, key);
@@ -147,9 +152,10 @@ function getTooltip(key, guessVal, targetVal, guessUnit, targetUnit) {
 }
 
 function updateHighlight(items) {
-  items.forEach((item, i) => {
-    item.style.backgroundColor = i === highlightedIndex ? '#e0eaff' : '';
-  });
+  selectedUnit =
+    items.forEach((item, i) => {
+      item.style.backgroundColor = i === highlightedIndex ? '#e0eaff' : '';
+    });
 }
 
 
@@ -223,7 +229,13 @@ fetch('data/units.json')
 
 document.getElementById('searchBtn').addEventListener('click', function () {
   const query = document.getElementById('unitInput').value.toLowerCase();
-  const unit = units.find(u => u && u.name && u.name.toLowerCase() === query);
+  let unit = null;
+  if (selectedUnit && selectedUnit.name.toLowerCase() === query) {
+    unit = selectedUnit;
+  } else {
+    unit = units.find(u => u && u.name && u.name.toLowerCase() === query);
+  }
+
   if (!unit) return;
 
   const flatUnit = flatten(unit);
@@ -242,7 +254,17 @@ document.getElementById('searchBtn').addEventListener('click', function () {
     }
 
 
-    if (guessVal === targetVal) {
+    let isExactMatch = guessVal === targetVal;
+
+    if (key === 'categories') {
+      const normalize = arr => [...new Set((arr || []).map(s => s.trim().toLowerCase()))].sort();
+      const normGuess = normalize(guessVal);
+      const normTarget = normalize(targetVal);
+      isExactMatch = normGuess.length === normTarget.length &&
+        normGuess.every((val, i) => val === normTarget[i]);
+    }
+
+    if (isExactMatch) {
       td.classList.add('match');
     } else if (
       isClose(key, guessVal, targetVal, flatUnit, flatTarget)
@@ -253,9 +275,16 @@ document.getElementById('searchBtn').addEventListener('click', function () {
 
 
     row.appendChild(td);
+
+    input.value = '';
+    selectedUnit = null;
+    highlightedIndex = -1;
+    list.innerHTML = '';
   }
 
-  table.appendChild(row);
+  const header = table.querySelector('tr');
+  table.insertBefore(row, header.nextSibling);
+
   if (flatUnit.name === flatTarget.name) {
     const revealBox = document.getElementById('revealUnit');
     revealBox.className = 'success-box';
@@ -317,7 +346,7 @@ input.addEventListener('input', () => {
     div.addEventListener('mousedown', () => {
       input.value = match.name;
       list.innerHTML = '';
-      highlightedIndex = -1;
+      selectedUnit = match; // ✅ store exact match
     });
     list.appendChild(div);
   });
@@ -343,7 +372,9 @@ input.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') {
     e.preventDefault();
     if (highlightedIndex >= 0 && currentSuggestions[highlightedIndex]) {
-      input.value = currentSuggestions[highlightedIndex].name;
+      const match = currentSuggestions[highlightedIndex];
+      input.value = match.name;
+      selectedUnit = match; // ✅ ensure correct unit is stored
       list.innerHTML = '';
       highlightedIndex = -1;
     }
