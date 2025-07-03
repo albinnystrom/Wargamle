@@ -4,10 +4,10 @@ let flatTarget = null;
 let highlightedIndex = -1;
 let currentSuggestions = [];
 let selectedUnit = null;
+let constValue = null;
 
-function getDateSeed() {
-  const now = new Date();
-  return Number(`${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`);
+function getDateSeed(date) {
+  return Number(`${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, '0')}${String(date.getDate()).padStart(2, '0')}`);
 }
 
 function mulberry32(seed) {
@@ -18,6 +18,28 @@ function mulberry32(seed) {
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+  const savedDate = localStorage.getItem('wgrdle_selected_date');
+  const picker = document.getElementById('datePicker');
+
+  if (savedDate) {
+    picker.value = savedDate;
+  } else {
+    const today = new Date().toISOString().split('T')[0];
+    picker.value = today;
+  }
+});
+
+document.getElementById('datePicker').addEventListener('change', () => {
+  const dailyToggle = document.getElementById('dailyToggle');
+  const dateValue = document.getElementById('datePicker').value;
+
+  if (dailyToggle.checked) {
+    localStorage.setItem('wgrdle_selected_date', dateValue);
+    location.reload();
+  }
+});
 
 
 const closenessSets = {
@@ -183,16 +205,20 @@ function parseValue(val) {
 
 function selectUnit(units) {
   const dailyMode = document.getElementById('dailyToggle').checked;
+  let date;
 
   if (dailyMode) {
-    const today = new Date();
-    const seed = getDateSeed(today);
+    const saved = localStorage.getItem('wgrdle_selected_date');
+    date = saved ? new Date(saved) : new Date();
+    const seed = getDateSeed(date);
     const rng = mulberry32(seed);
     return units[Math.floor(rng() * units.length)];
   } else {
     return units[Math.floor(Math.random() * units.length)];
   }
 }
+
+
 
 fetch('data/units.json')
   .then(res => res.json())
@@ -413,3 +439,16 @@ input.addEventListener('keydown', (e) => {
 document.addEventListener('click', (e) => {
   if (!input.contains(e.target)) list.innerHTML = '';
 });
+
+
+
+
+document.getElementById('dailyToggle').addEventListener('change', () => {
+  if (!document.getElementById('dailyToggle').checked) {
+    localStorage.removeItem('wgrdle_selected_date');
+  }
+  location.reload();
+});
+
+
+
