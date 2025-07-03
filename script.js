@@ -5,6 +5,20 @@ let highlightedIndex = -1;
 let currentSuggestions = [];
 let selectedUnit = null;
 
+function getDateSeed() {
+  const now = new Date();
+  return Number(`${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`);
+}
+
+function mulberry32(seed) {
+  return function () {
+    let t = seed += 0x6D2B79F5;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
 
 const closenessSets = {
   autonomy: ['60', '75', '90', '105', '120', '135', '150', '160', '165', '180', '195', '200', '230', '240', '250', '270', '280', '300', '320', '350', '360', '370', '390', '400', '410', '420', '425', '430', '435', '440', '450', '460', '470', '480', '500', '510', '520', '530', '540', '550', '560', '570', '575', '600', '630', '640', '650', '660', '680', '685', '700', '710', '720', '750', '785', '790', '800', '850', '900', '930', '950', '1000', '1100', '1200', '1600', '2000'],
@@ -167,11 +181,24 @@ function parseValue(val) {
   return typeof val === 'number' ? val : val;
 }
 
+function selectUnit(units) {
+  const dailyMode = document.getElementById('dailyToggle').checked;
+
+  if (dailyMode) {
+    const today = new Date();
+    const seed = getDateSeed(today);
+    const rng = mulberry32(seed);
+    return units[Math.floor(rng() * units.length)];
+  } else {
+    return units[Math.floor(Math.random() * units.length)];
+  }
+}
+
 fetch('data/units.json')
   .then(res => res.json())
   .then(data => {
     units = data.filter(u => u && u.name);
-    targetUnit = units[Math.floor(Math.random() * units.length)];
+    targetUnit = selectUnit(units);
     flatTarget = flatten(targetUnit);
     document.getElementById('newUnitBtn').addEventListener('click', () => {
       location.reload(); // easiest way to reset everything
