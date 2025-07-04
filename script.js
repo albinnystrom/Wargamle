@@ -21,12 +21,13 @@ function mulberry32(seed) {
 
 function initializeDatePicker() {
   const picker = document.getElementById('datePicker');
+  const today = new Date().toISOString().split('T')[0];
+  picker.setAttribute('max', today);
   const savedDate = localStorage.getItem('wgrdle_selected_date');
 
-  if (savedDate) {
+  if (savedDate && savedDate <= today) {
     picker.value = savedDate;
   } else {
-    const today = new Date().toISOString().split('T')[0];
     picker.value = today;
     localStorage.setItem('wgrdle_selected_date', today);
   }
