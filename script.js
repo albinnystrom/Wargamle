@@ -19,17 +19,19 @@ function mulberry32(seed) {
   };
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  const savedDate = localStorage.getItem('wgrdle_selected_date');
+function initializeDatePicker() {
   const picker = document.getElementById('datePicker');
+  const savedDate = localStorage.getItem('wgrdle_selected_date');
 
   if (savedDate) {
     picker.value = savedDate;
   } else {
     const today = new Date().toISOString().split('T')[0];
     picker.value = today;
+    localStorage.setItem('wgrdle_selected_date', today);
   }
-});
+}
+
 
 document.getElementById('datePicker').addEventListener('change', () => {
   const dailyToggle = document.getElementById('dailyToggle');
@@ -224,6 +226,7 @@ fetch('data/units.json')
   .then(res => res.json())
   .then(data => {
     units = data.filter(u => u && u.name);
+    initializeDatePicker();
     targetUnit = selectUnit(units);
     flatTarget = flatten(targetUnit);
     document.getElementById('newUnitBtn').addEventListener('click', () => {
