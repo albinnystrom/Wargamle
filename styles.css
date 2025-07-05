@@ -1,270 +1,305 @@
 body {
-      font-family: system-ui, sans-serif;
-      background-color: #f7f9fb;
-      margin: 0;
-      padding: 2rem;
-      display: flex;
-      justify-content: center;
-      background-image: url('images/background.webp');
-      background-size: cover;
-    }
+  font-family: system-ui, sans-serif;
+  background-color: #f7f9fb;
+  margin: 0;
+  padding: 2rem;
+  display: flex;
+  justify-content: center;
+  background-image: url("images/background2.webp");
+  background-size: cover;
+}
 
-    .container {
-      max-width: 1500px;
-      min-height: 80vh;
-      width: 100%;
-      display: flex;
-      background: rgb(223, 223, 223);
-      opacity: 0.90;
-      padding: 2rem;
-      border-radius: 1rem;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
-      overflow-x: auto;
-      flex-direction: column;
-      justify-content: flex-start;
-      /* ensures no content leaks outside */
-    }
+.container {
+  max-width: 1250px;
+  min-height: 80vh;
+  width: 100%;
+  display: flex;
+  background: rgba(228, 226, 212, 0);
+  opacity: 1;
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+  overflow-x: auto;
+  flex-direction: column;
+  justify-content: flex-start;
+  /* ensures no content leaks outside */
+}
 
+h1 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
 
-    h1 {
-      text-align: center;
-      margin-bottom: 1.5rem;
-    }
+.search-bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+}
 
-    .search-bar {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 0.5rem;
-      margin-bottom: 1.5rem;
-      position: relative;
-    }
+input,
+button {
+  font-size: 1rem;
+  padding: 0.6rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid #ccc;
+  color: black;
+}
 
-    input,
-    button {
-      font-size: 1rem;
-      padding: 0.6rem 1rem;
-      border-radius: 0.5rem;
-      border: 1px solid #ccc;
-    }
+input {
+  width: 300px;
+  background-color: whitesmoke;
+}
 
-    input {
-      width: 300px;
-    }
+button {
+  background: #5b3d17;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
 
-    button {
-      background: #2c7be5;
-      color: white;
-      border: none;
-      cursor: pointer;
-      transition: background 0.2s ease;
-    }
+button:hover {
+  background: #1a5fcc;
+}
 
-    button:hover {
-      background: #1a5fcc;
-    }
+#autocompleteList {
+  position: absolute;
+  background: white;
+  border: 1px solid #ccc;
+  width: 300px;
+  top: 100%;
+  left: 0;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+}
 
-    #autocompleteList {
-      position: absolute;
-      background: white;
-      border: 1px solid #ccc;
-      width: 300px;
-      top: 100%;
-      left: 0;
-      border-radius: 0.5rem;
-      overflow: hidden;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-      z-index: 10;
-    }
+#autocompleteList div {
+  padding: 0.5rem;
+}
 
-    #autocompleteList div {
-      padding: 0.5rem;
-    }
+#autocompleteList div:hover {
+  background-color: #f1f1f1;
+}
 
-    #autocompleteList div:hover {
-      background-color: #f1f1f1;
-    }
+table {
+  width: max-content;
+  max-width: 100%;
+  margin: 0 auto;
+  border-collapse: collapse;
+  border-radius: 15px;
+  table-layout: fixed;
+  word-wrap: break-word;
+  overflow-x: auto;
+  display: block;
+}
 
-    table {
-      width: max-content;
-      max-width: 100%;
-      margin: 0 auto;
-      border-collapse: collapse;
-      table-layout: fixed;
-      word-wrap: break-word;
-      overflow-x: auto;
-      display: block;
-    }
+th,
+td {
+  border: 1px solid #e0e0e0;
+  background-color: rgb(237, 234, 226);
+  padding: 0.75rem;
+  text-align: center;
+  font-size: 0.95rem;
+}
 
+#revealTable td {
+  background-color: #ffc1c1;
+}
 
+td {
+  vertical-align: middle;
+}
 
-    th,
-    td {
-      border: 1px solid #e0e0e0;
-      padding: 0.75rem;
-    }
+th {
+  background-color: #efd8bb;
+}
 
-    td img {
-      vertical-align: middle;
-    }
+tr {
+  padding: auto;
+}
 
+.match {
+  background-color: #bedf88;
+}
 
-    th {
-      background-color: #f0f4f8;
-    }
+.close {
+  background-color: #f5e37c;
+}
 
-    .match {
-      background-color: #d3f9d8;
-    }
+.tooltip {
+  position: relative;
+  cursor: help;
+}
 
-    .close {
-      background-color: #fff3b0;
-    }
+.tooltip:hover::after {
+  content: attr(data-tooltip);
+  position: fixed;
+  /* ✅ was absolute */
+  background: #333;
+  color: #fff;
+  font-size: 0.8rem;
+  padding: 4px 6px;
+  border-radius: 4px;
+  white-space: nowrap;
+  z-index: 9999;
+  /* ✅ higher z-index */
+  top: auto;
+  left: auto;
+  transform: translateY(4px);
+  pointer-events: none;
+}
 
-    .tooltip {
-      position: relative;
-      cursor: help;
-    }
+h1 {
+  text-align: center;
+  font-size: 2.5rem;
+  margin-bottom: 0.2rem;
+  letter-spacing: 1px;
+}
 
-    .tooltip:hover::after {
-      content: attr(data-tooltip);
-      position: fixed;
-      /* ✅ was absolute */
-      background: #333;
-      color: #fff;
-      font-size: 0.8rem;
-      padding: 4px 6px;
-      border-radius: 4px;
-      white-space: nowrap;
-      z-index: 9999;
-      /* ✅ higher z-index */
-      top: auto;
-      left: auto;
-      transform: translateY(4px);
-      pointer-events: none;
-    }
+#title {
+  color: rgb(246, 216, 162);
+  border: rgb(210, 186, 141);
+  font-size: 4.5rem;
+  margin-bottom: 0.5rem;
+  font-weight: bolder;
+  text-decoration: overline underline;
+  text-shadow: 2px 2px 2px black;
+}
 
-    h1 {
-      text-align: center;
-      font-size: 2.5rem;
-      margin-bottom: 0.2rem;
-      letter-spacing: 1px;
-    }
+#subtitle {
+  text-align: center;
+  font-size: 1.5rem;
+  margin-top: 0;
+  margin-bottom: 2rem;
+  font-weight: bold;
+  color: wheat;
+  text-shadow: 1px 1px 1px black;
+}
 
-    #subtitle {
-      text-align: center;
-      font-size: 1.2rem;
-      margin-bottom: 1.5rem;
-      font-weight: normal;
-      color: #555;
-    }
+#giveUpBtn {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
 
-    #giveUpBtn {
-      background: #e74c3c;
-      color: white;
-      border: none;
-      border-radius: 0.5rem;
-      padding: 0.6rem 1rem;
-      cursor: pointer;
-      transition: background 0.2s ease;
-    }
+#giveUpBtn:hover {
+  background: #c0392b;
+}
 
-    #giveUpBtn:hover {
-      background: #c0392b;
-    }
+.reveal-box {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background-color: #ffc1c1;
+  border: 2px solid #e7a9a9;
+  border-radius: 0.5rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #5c452b;
+  text-align: center;
+  display: none;
+  /* hidden by default */
+}
 
-    .reveal-box {
-      margin-top: 1.5rem;
-      padding: 1rem;
-      background-color: #fbeedb;
-      border: 2px solid #e0c49a;
-      border-radius: 0.5rem;
-      font-size: 1.1rem;
-      font-weight: bold;
-      color: #5c452b;
-      text-align: center;
-      display: none;
-      /* hidden by default */
-    }
+.autocomplete-item:hover,
+.autocomplete-item.highlight {
+  background-color: #e0eaff;
+}
 
-    .autocomplete-item:hover,
-    .autocomplete-item.highlight {
-      background-color: #e0eaff;
-    }
+.success-box {
+  background: #d3f9d8;
+  color: #2e7d32;
+  border: 2px solid #b2e2b2;
+  padding: 1rem;
+  margin-top: 1.5rem;
+  border-radius: 0.5rem;
+  font-size: 1.1rem;
+  text-align: center;
+  font-weight: bold;
+}
 
-    .success-box {
-      background: #d3f9d8;
-      color: #2e7d32;
-      border: 2px solid #b2e2b2;
-      padding: 1rem;
-      margin-top: 1.5rem;
-      border-radius: 0.5rem;
-      font-size: 1.1rem;
-      text-align: center;
-      font-weight: bold;
-    }
+.daily-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 10px;
+  width: 450px;
+  margin: 0 auto;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}
 
-    .daily-toggle {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 1rem;
-      margin-bottom: 1rem;
-    }
+.options {
+  background-color: rgba(245, 222, 179, 0.71);
+  border-radius: 10px;
+  padding: 10px 10px 0px 10px;
+  margin: 0 auto;
+  margin-bottom: 0.5rem;
+}
 
-    .toggle-label {
-      font-size: 1rem;
-      color: #333;
-    }
+.toggle-label {
+  font-size: 1rem;
+  color: #333;
+}
 
-    .switch {
-      position: relative;
-      display: inline-block;
-      width: 50px;
-      height: 26px;
-    }
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 26px;
+}
 
-    .switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
 
-    .slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: #ccc;
-      transition: 0.2s;
-      border-radius: 26px;
-    }
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.2s;
+  border-radius: 26px;
+}
 
-    .slider:before {
-      position: absolute;
-      content: "";
-      height: 20px;
-      width: 20px;
-      left: 3px;
-      bottom: 3px;
-      background-color: white;
-      transition: 0.2s;
-      border-radius: 50%;
-    }
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.2s;
+  border-radius: 50%;
+}
 
-    input:checked+.slider {
-      background-color: #2c7be5;
-    }
+input:checked + .slider {
+  background-color: #2c7be5;
+}
 
-    input:checked+.slider:before {
-      transform: translateX(24px);
-    }
+input:checked + .slider:before {
+  transform: translateX(24px);
+}
 
-    #datePicker {
-      padding: 0.4rem 0.6rem;
-      font-size: 1rem;
-      border-radius: 0.5rem;
-      border: 1px solid #ccc;
-    }
+#datePicker {
+  padding: 0.4rem 0.6rem;
+  font-size: 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid #ccc;
+}

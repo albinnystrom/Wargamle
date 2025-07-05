@@ -1,44 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Unit Match</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
 
-<head>
-  <meta charset="UTF-8">
-  <title>Unit Match</title>
-  <link rel="stylesheet" href="styles.css">
-</head>
+  <body>
+    <div class="container">
+      <h1 id="title">WGRDle</h1>
+      <h2 id="subtitle">Guess the Wargame: Red Dragon unit</h2>
+      <div class="options">
+        <div class="daily-toggle">
+          <label class="toggle-label">Daily</label>
+          <label class="switch">
+            <input type="checkbox" id="dailyToggle" checked />
+            <span class="slider"></span>
+          </label>
+          <input type="date" id="datePicker" />
+        </div>
 
-<body>
-  <div class="container">
-    <h1 id="title">WGRDle</h1>
-    <h3 id="subtitle">Guess the Wargame: Red Dragon unit</h3>
-    <div class="daily-toggle">
-      <label class="toggle-label">Daily</label>
-      <label class="switch">
-        <input type="checkbox" id="dailyToggle" checked>
-        <span class="slider"></span>
-      </label>
-      <input type="date" id="datePicker" />
-    </div>
-
-    <div class="search-bar">
-      <div style="position: relative;">
-        <input type="text" id="unitInput" placeholder="Enter unit name..." autocomplete="off" />
-        <div id="autocompleteList"></div>
+        <div class="search-bar">
+          <div style="position: relative">
+            <input
+              type="text"
+              id="unitInput"
+              placeholder="Enter unit name..."
+              autocomplete="off"
+            />
+            <div id="autocompleteList"></div>
+          </div>
+          <button id="searchBtn">Match</button>
+          <button id="newUnitBtn">New Unit</button>
+          <button id="giveUpBtn">Give up</button>
+        </div>
       </div>
-      <button id="searchBtn">Match</button>
-      <button id="giveUpBtn">Give up</button>
-      <button id="newUnitBtn">New Unit</button>
+
+      <table id="resultsTable"></table>
+      <div id="revealUnit" class="reveal-box"></div>
+      <table id="revealTable"></table>
     </div>
 
-    <table id="resultsTable"></table>
-    <div id="revealUnit" class="reveal-box"></div>
-    <table id="revealTable"></table>
-
-
-  </div>
-
-  <script type="module" src="src/index.js"></script>
-</body>
-
-
+    <script type="module" src="src/index.js"></script>
+  </body>
 </html>
