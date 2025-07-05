@@ -48,8 +48,7 @@ document.getElementById('datePicker').addEventListener('change', () => {
 const closenessSets = {
   autonomy: ['60', '75', '90', '105', '120', '135', '150', '160', '165', '180', '195', '200', '230', '240', '250', '270', '280', '300', '320', '350', '360', '370', '390', '400', '410', '420', '425', '430', '435', '440', '450', '460', '470', '480', '500', '510', '520', '530', '540', '550', '560', '570', '575', '600', '630', '640', '650', '660', '680', '685', '700', '710', '720', '750', '785', '790', '800', '850', '900', '930', '950', '1000', '1100', '1200', '1600', '2000'],
   strength: ['2', '3', '4', '5', '6', '8', '10', '15', '100'],
-  optics_ground: ['Bad', 'Poor', 'Medium', 'Good', 'Very good', 'Exceptional'],
-  optics_air: ['10', '20', '40', '80', '120', '150', '170', '250', '300', '450', '900'],
+  optics: ['Bad', 'Poor', 'Medium', 'Good', 'Very good', 'Exceptional'],
   stealth: ['Poor', 'Medium', 'Good', 'Very good', 'Exceptional'],
   size: ['Very small', 'Small', 'Medium', 'Big', 'Very big'],
 };
@@ -70,7 +69,7 @@ function flatten(unit) {
 
 function normalize(value, key) {
   if (value === 'N/A') {
-    return ['optics_ground', 'optics_air', 'size'].includes(key) ? '0' : null;
+    return ['optics', 'size'].includes(key) ? '0' : null;
   }
   return value;
 }
