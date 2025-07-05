@@ -131,7 +131,7 @@ with open("rawdata/wgrd.csv") as f1:
                 "country": row["Country"],
                 "coalition": coalition(row["Country"]),
                 "tab": row["Tab"],
-                "speed": row["Speed              (23 km - 1100km)"],
+                "speed": row["Speed              (23 km - 1100km)"].split(" ")[0],
                 "autonomy": row["Autonomy"],
                 "strength": row["Strength"],
                 "optics": optics(
