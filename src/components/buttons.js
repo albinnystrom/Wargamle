@@ -156,8 +156,11 @@ export function initializeGiveUpBtn() {
   });
 }
 
-document.getElementById("dailyToggle").addEventListener("change", () => {
-  if (!document.getElementById("dailyToggle").checked) {
+const toggle = document.getElementById("dailyToggle");
+toggle.addEventListener("change", () => {
+  localStorage.setItem("wgrdle_toggle_state", toggle.checked ? "on" : "off");
+
+  if (!toggle.checked) {
     localStorage.removeItem("wgrdle_selected_date");
   }
   location.reload();
