@@ -5,7 +5,7 @@ body {
   padding: 2rem;
   display: flex;
   justify-content: center;
-  background-image: url("images/background2.webp");
+  background-image: url("images/background.webp");
   background-size: cover;
 }
 
