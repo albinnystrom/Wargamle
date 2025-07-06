@@ -168,6 +168,7 @@ h1 {
   margin-bottom: 0.5rem;
   font-weight: bolder;
   text-decoration: overline underline;
+  text-underline-offset: 20px;
   text-shadow: 2px 2px 2px black;
 }
 
@@ -302,4 +303,12 @@ input:checked + .slider:before {
   font-size: 1rem;
   border-radius: 0.5rem;
   border: 1px solid #ccc;
+}
+
+img.logo {
+  width: 400px;
+  height: auto;
+  border-radius: 8px;
+  align-self: center;
+  margin-bottom: 1rem;
 }
