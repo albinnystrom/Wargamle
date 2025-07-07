@@ -113,7 +113,11 @@ export function initializeSearch() {
     const header = table.querySelector("tr");
     table.insertBefore(row, header.nextSibling);
 
-    if (flatUnit.name === sharedObjects.flatTarget.name) {
+    const allMatch = [...row.children].every((td) =>
+      td.classList.contains("match")
+    );
+
+    if (allMatch) {
       const revealBox = document.getElementById("revealUnit");
       revealBox.className = "success-box";
       revealBox.textContent = `Correct! The unit is ${sharedObjects.targetUnit.name}`;
