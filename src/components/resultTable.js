@@ -22,7 +22,11 @@ export function initializeTable() {
     guessRow.appendChild(td);
 
     td.addEventListener("click", function () {
-      if (sharedObjects.gotHint && !td.classList.contains("match")) {
+      if (
+        sharedObjects.gotHint &&
+        !td.classList.contains("match") &&
+        key != "name"
+      ) {
         sharedObjects.gotHint = false;
         td.textContent = sharedObjects.targetUnit[key];
         td.classList.add("match");
