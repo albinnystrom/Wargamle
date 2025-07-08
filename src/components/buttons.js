@@ -92,6 +92,10 @@ export function initializeSearch() {
 
       if (isExactMatch) {
         td.classList.add("match");
+        const top_td =
+          table.querySelector("tr").children[[...row.children].length];
+        top_td.classList.add("match");
+        top_td.textContent = td.textContent;
       } else if (
         isClose(key, guessVal, targetVal, flatUnit, sharedObjects.flatTarget)
       ) {
@@ -100,6 +104,13 @@ export function initializeSearch() {
           "data-tooltip",
           getTooltip(key, guessVal, flatUnit, sharedObjects.flatTarget)
         );
+
+        const top_td =
+          table.querySelector("tr").children[[...row.children].length];
+        if (!top_td.classList.contains("match")) {
+          top_td.classList.add("close");
+          top_td.textContent = td.textContent;
+        }
       }
 
       row.appendChild(td);
@@ -111,17 +122,29 @@ export function initializeSearch() {
     }
 
     const header = table.querySelector("tr");
-    table.insertBefore(row, header.nextSibling);
+    table.insertBefore(row, header.nextSibling.nextSibling);
 
     const allMatch = [...row.children].every((td) =>
       td.classList.contains("match")
     );
 
     if (allMatch) {
-      const revealBox = document.getElementById("revealUnit");
-      revealBox.className = "success-box";
-      revealBox.textContent = `Correct! The unit is ${sharedObjects.targetUnit.name}`;
-      revealBox.style.display = "block";
+      const infoBox = document.getElementById("infoBox");
+      infoBox.className = "success-box";
+      infoBox.textContent = `Correct! The unit is ${sharedObjects.targetUnit.name}`;
+      infoBox.style.display = "block";
+      return;
+    }
+
+    if (sharedObjects.guesses === 5) {
+      sharedObjects.guesses -= 4;
+      sharedObjects.gotHint = true;
+      const infoBox = document.getElementById("infoBox");
+      infoBox.className = "success-box";
+      infoBox.textContent = `Every five guesses you can reveal one category by clicking it in the top row.`;
+      infoBox.style.display = "block";
+    } else {
+      sharedObjects.guesses++;
     }
   });
 }
@@ -132,31 +155,22 @@ document.getElementById("newUnitBtn").addEventListener("click", () => {
 
 export function initializeGiveUpBtn() {
   document.getElementById("giveUpBtn").addEventListener("click", () => {
-    const revealBox = document.getElementById("revealUnit");
-    revealBox.textContent = `The unit was: ${sharedObjects.targetUnit.name}`;
-    revealBox.style.display = "block";
+    const infoBox = document.getElementById("infoBox");
+    infoBox.className = "reveal-box";
+    infoBox.textContent = `The unit was: ${sharedObjects.targetUnit.name}`;
+    infoBox.style.display = "block";
 
-    const revealTable = document.getElementById("revealTable");
-    revealTable.innerHTML = "";
-
-    const headerRow = document.createElement("tr");
-    for (const key of sharedObjects.displayKeys) {
-      const th = document.createElement("th");
-      th.textContent = key;
-      headerRow.appendChild(th);
-    }
-    revealTable.appendChild(headerRow);
-
-    const row = document.createElement("tr");
-    for (const key of sharedObjects.displayKeys) {
-      const td = document.createElement("td");
-      const val = sharedObjects.flatTarget[key];
-      td.textContent = Array.isArray(val) ? abbreviateCategories(val) : val;
-      td.classList.add("match");
-      row.appendChild(td);
-    }
-    revealTable.appendChild(row);
-    revealTable.style.display = "table";
+    const toprow = document
+      .getElementById("resultsTable")
+      .querySelector("tr").children;
+    sharedObjects.displayKeys.forEach((key, index) => {
+      const td = toprow[index];
+      if (!td.classList.contains("match") && !td.classList.contains("close")) {
+        const val = sharedObjects.flatTarget[key];
+        td.classList.add("fail");
+        td.textContent = Array.isArray(val) ? abbreviateCategories(val) : val;
+      }
+    });
   });
 }
 

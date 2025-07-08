@@ -124,12 +124,16 @@ tr {
   padding: auto;
 }
 
-.match {
-  background-color: #bedf88;
+.fail {
+  background-color: #ffc1c1;
 }
 
 .close {
   background-color: #f5e37c;
+}
+
+.match {
+  background-color: #bedf88;
 }
 
 .tooltip {

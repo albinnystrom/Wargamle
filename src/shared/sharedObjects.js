@@ -7,4 +7,6 @@ export const sharedObjects = {
   units: [],
   displayKeys: [],
   list: document.getElementById("autocompleteList"),
+  gotHint: false,
+  guesses: 1,
 };
