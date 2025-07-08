@@ -10,15 +10,13 @@ body {
 }
 
 .container {
-  max-width: 1250px;
+  max-width: 1300px;
   min-height: 80vh;
   width: 100%;
   display: flex;
   background: rgba(228, 226, 212, 0);
   opacity: 1;
   padding: 2rem;
-  border-radius: 1rem;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
   overflow-x: auto;
   flex-direction: column;
   justify-content: flex-start;
