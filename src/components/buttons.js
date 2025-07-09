@@ -3,13 +3,17 @@ import {
   abbreviateCategories,
   flatten,
 } from "../utils/formatting.js";
-import { isClose } from "../utils/closeness.js";
+import { isClose, upOrDown } from "../utils/closeness.js";
 import { closenessSets } from "../utils/constants.js";
 import { sharedObjects } from "../shared/sharedObjects.js";
+import { updateSummaryVals } from "./resultTable.js";
 
 function getTooltip(key, guessVal, guessUnit, targetUnit) {
   if (key == "price") {
-    return "+-5 if price <= 50, else +-10";
+    const val = Number(guessVal);
+    const low = val <= 50 ? val - 5 : val - 10;
+    const high = val < 50 ? val + 5 : val + 10;
+    return `${[low, key, high].join(" ≤ ")}`;
   }
   if (key.startsWith("weapon") && !key.endsWith("_type")) {
     const typeKey = key + "_type";
@@ -69,7 +73,10 @@ export function initializeSearch() {
       const td = document.createElement("td");
       const guessVal = flatUnit[key];
       const targetVal = sharedObjects.flatTarget[key];
+      const summaryRow =
+        table.querySelector("tr").children[[...row.children].length];
 
+      //Set text
       if (key === "categories") {
         td.textContent = abbreviateCategories(guessVal);
       } else {
@@ -78,6 +85,7 @@ export function initializeSearch() {
           : guessVal;
       }
 
+      //Determine match
       let isExactMatch = guessVal === targetVal;
 
       if (key === "categories") {
@@ -90,12 +98,13 @@ export function initializeSearch() {
           normGuess.every((val, i) => val === normTarget[i]);
       }
 
+      // Handle exact match
       if (isExactMatch) {
         td.classList.add("match");
-        const top_td =
-          table.querySelector("tr").children[[...row.children].length];
-        top_td.classList.add("match");
-        top_td.textContent = td.textContent;
+        summaryRow.classList.add("match");
+        summaryRow.textContent = td.textContent;
+
+        // Handle close
       } else if (
         isClose(key, guessVal, targetVal, flatUnit, sharedObjects.flatTarget)
       ) {
@@ -105,12 +114,15 @@ export function initializeSearch() {
           getTooltip(key, guessVal, flatUnit, sharedObjects.flatTarget)
         );
 
-        const top_td =
-          table.querySelector("tr").children[[...row.children].length];
-        if (!top_td.classList.contains("match")) {
-          top_td.classList.add("close");
-          top_td.textContent = td.textContent;
+        if (!summaryRow.classList.contains("match")) {
+          updateSummaryVals(summaryRow, key, guessVal, true);
+
+          summaryRow.classList.add("close");
         }
+        // Handle not close (give hint)
+      } else {
+        td.textContent = upOrDown(key, guessVal, targetVal) + td.textContent;
+        updateSummaryVals(summaryRow, key, guessVal, false);
       }
 
       row.appendChild(td);
