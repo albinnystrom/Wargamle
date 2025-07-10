@@ -177,10 +177,10 @@ export function initializeGiveUpBtn() {
       .querySelector("tr").children;
     sharedObjects.displayKeys.forEach((key, index) => {
       const td = toprow[index];
+      const val = sharedObjects.flatTarget[key];
+      td.textContent = Array.isArray(val) ? abbreviateCategories(val) : val;
       if (!td.classList.contains("match") && !td.classList.contains("close")) {
-        const val = sharedObjects.flatTarget[key];
         td.classList.add("fail");
-        td.textContent = Array.isArray(val) ? abbreviateCategories(val) : val;
       }
     });
   });
