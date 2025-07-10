@@ -1,5 +1,44 @@
 import { normalize } from "./formatting.js";
-import { closenessSets } from "./constants.js";
+import { closenessSets, ordinalCats } from "./constants.js";
+
+function isAdjacent(value, key) {
+  const set = closenessSets[key];
+  if (!set) return [];
+  const idx = set.indexOf(value);
+  return idx !== -1 ? [set[idx - 1], set[idx + 1]].filter(Boolean) : [];
+}
+
+export function getClose(key, guessVal) {
+  guessVal = !isNaN(Number(guessVal)) ? Number(guessVal) : guessVal;
+  if (
+    [
+      "name",
+      "country",
+      "tab",
+      "country",
+      "weapon1",
+      "weapon2",
+      "weapon3",
+    ].includes(key)
+  )
+    return false;
+
+  if (key == "price") {
+    return [
+      guessVal <= 55 ? guessVal - 5 : guessVal - 10,
+      guessVal <= 50 ? guessVal + 5 : guessVal + 10,
+    ];
+  }
+
+  if (key == "year") {
+    return [guessVal - 1, guessVal + 1];
+  }
+  console.log(key);
+  const idx = closenessSets[key].indexOf(String(guessVal));
+
+  const set = closenessSets[key];
+  return [set[Math.max(0, idx - 1)], set[Math.min(set.length - 1, idx + 1)]];
+}
 
 export function isClose(key, guessVal, targetVal, guessUnit, targetUnit) {
   if (key === "name" || key === "tab") return false;
@@ -50,9 +89,34 @@ export function isClose(key, guessVal, targetVal, guessUnit, targetUnit) {
   return adjacent.includes(normGuess);
 }
 
-function isAdjacent(value, key) {
-  const set = closenessSets[key];
-  if (!set) return [];
-  const idx = set.indexOf(value);
-  return idx !== -1 ? [set[idx - 1], set[idx + 1]].filter(Boolean) : [];
+export function compareVals(key, a, b) {
+  if (
+    [
+      "name",
+      "categories",
+      "country",
+      "tab",
+      "weapon1",
+      "weapon2",
+      "weapon3",
+    ].includes(key)
+  ) {
+    return "";
+  }
+
+  a = a == "N/A" ? 0 : a;
+  b = b == "N/A" ? 0 : b;
+
+  if (["price", "year", "speed", "autonomy", "strength"].includes(key)) {
+    return Number(a) - Number(b) > 0 ? true : false;
+  } else {
+    const x = closenessSets[key].indexOf(a);
+    const y = closenessSets[key].indexOf(b);
+    return x - y > 0 ? true : false;
+  }
+}
+
+export function upOrDown(key, guessVal, targetVal) {
+  const arrow = compareVals(key, guessVal, targetVal) ? "↓" : "↑";
+  return ordinalCats.includes(key) ? arrow : "";
 }

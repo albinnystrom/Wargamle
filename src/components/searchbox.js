@@ -10,6 +10,21 @@ function updateHighlight(items) {
   });
 }
 
+function getMatchScore(unitName, query) {
+  const name = normalizeString(unitName);
+  const q = normalizeString(query);
+
+  if (name === q) return 100;
+  if (name.startsWith(q)) return 90;
+  if (name.includes(q)) return 80;
+  const nameWords = name.split(/\s+/);
+  const queryWords = q.split(/\s+/);
+  if (queryWords.every((qw) => nameWords.some((nw) => nw.startsWith(qw))))
+    return 70;
+
+  return 0;
+}
+
 export function initializeSearchBox() {
   sharedObjects.input.addEventListener("keydown", (e) => {
     const items = sharedObjects.list.querySelectorAll(".autocomplete-item");
@@ -64,13 +79,14 @@ export function initializeSearchBox() {
       return;
     }
 
-    const queryWords = normalizeString(query).split(/\s+/);
     currentSuggestions = sharedObjects.units
-      .filter((u) => {
-        const unitWords = normalizeString(u.name).split(/\s+/);
-        return queryWords.every((q) => unitWords.some((w) => w.startsWith(q)));
-      })
-      .slice(0, 10);
+      .map((u) => ({
+        unit: u,
+        score: getMatchScore(u.name, query),
+      }))
+      .filter((entry) => entry.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .map((entry) => entry.unit);
 
     currentSuggestions.forEach((match, index) => {
       const div = document.createElement("div");

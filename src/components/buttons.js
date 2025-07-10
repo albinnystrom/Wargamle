@@ -3,13 +3,17 @@ import {
   abbreviateCategories,
   flatten,
 } from "../utils/formatting.js";
-import { isClose } from "../utils/closeness.js";
+import { isClose, upOrDown } from "../utils/closeness.js";
 import { closenessSets } from "../utils/constants.js";
 import { sharedObjects } from "../shared/sharedObjects.js";
+import { updateSummaryVals } from "./resultTable.js";
 
 function getTooltip(key, guessVal, guessUnit, targetUnit) {
   if (key == "price") {
-    return "+-5 if price <= 50, else +-10";
+    const val = Number(guessVal);
+    const low = val <= 50 ? val - 5 : val - 10;
+    const high = val < 50 ? val + 5 : val + 10;
+    return `${[low, key, high].join(" ≤ ")}`;
   }
   if (key.startsWith("weapon") && !key.endsWith("_type")) {
     const typeKey = key + "_type";
@@ -69,7 +73,10 @@ export function initializeSearch() {
       const td = document.createElement("td");
       const guessVal = flatUnit[key];
       const targetVal = sharedObjects.flatTarget[key];
+      const summaryRow =
+        table.querySelector("tr").children[[...row.children].length];
 
+      //Set text
       if (key === "categories") {
         td.textContent = abbreviateCategories(guessVal);
       } else {
@@ -78,6 +85,7 @@ export function initializeSearch() {
           : guessVal;
       }
 
+      //Determine match
       let isExactMatch = guessVal === targetVal;
 
       if (key === "categories") {
@@ -90,8 +98,13 @@ export function initializeSearch() {
           normGuess.every((val, i) => val === normTarget[i]);
       }
 
+      // Handle exact match
       if (isExactMatch) {
         td.classList.add("match");
+        summaryRow.classList.add("match");
+        summaryRow.textContent = td.textContent;
+
+        // Handle close
       } else if (
         isClose(key, guessVal, targetVal, flatUnit, sharedObjects.flatTarget)
       ) {
@@ -100,6 +113,16 @@ export function initializeSearch() {
           "data-tooltip",
           getTooltip(key, guessVal, flatUnit, sharedObjects.flatTarget)
         );
+
+        if (!summaryRow.classList.contains("match")) {
+          updateSummaryVals(summaryRow, key, guessVal, true);
+
+          summaryRow.classList.add("close");
+        }
+        // Handle not close (give hint)
+      } else {
+        td.textContent = upOrDown(key, guessVal, targetVal) + td.textContent;
+        updateSummaryVals(summaryRow, key, guessVal, false);
       }
 
       row.appendChild(td);
@@ -111,13 +134,29 @@ export function initializeSearch() {
     }
 
     const header = table.querySelector("tr");
-    table.insertBefore(row, header.nextSibling);
+    table.insertBefore(row, header.nextSibling.nextSibling);
 
-    if (flatUnit.name === sharedObjects.flatTarget.name) {
-      const revealBox = document.getElementById("revealUnit");
-      revealBox.className = "success-box";
-      revealBox.textContent = `Correct! The unit is ${sharedObjects.targetUnit.name}`;
-      revealBox.style.display = "block";
+    const allMatch = [...row.children].every((td) =>
+      td.classList.contains("match")
+    );
+
+    if (allMatch) {
+      const infoBox = document.getElementById("infoBox");
+      infoBox.className = "success-box";
+      infoBox.textContent = `Correct! The unit is ${sharedObjects.targetUnit.name}`;
+      infoBox.style.display = "block";
+      return;
+    }
+
+    if (sharedObjects.guesses === 5) {
+      sharedObjects.guesses -= 4;
+      sharedObjects.gotHint = true;
+      const infoBox = document.getElementById("infoBox");
+      infoBox.className = "success-box";
+      infoBox.textContent = `Every five guesses you can reveal one category by clicking it in the top row.`;
+      infoBox.style.display = "block";
+    } else {
+      sharedObjects.guesses++;
     }
   });
 }
@@ -128,31 +167,22 @@ document.getElementById("newUnitBtn").addEventListener("click", () => {
 
 export function initializeGiveUpBtn() {
   document.getElementById("giveUpBtn").addEventListener("click", () => {
-    const revealBox = document.getElementById("revealUnit");
-    revealBox.textContent = `The unit was: ${sharedObjects.targetUnit.name}`;
-    revealBox.style.display = "block";
+    const infoBox = document.getElementById("infoBox");
+    infoBox.className = "reveal-box";
+    infoBox.textContent = `The unit was: ${sharedObjects.targetUnit.name}`;
+    infoBox.style.display = "block";
 
-    const revealTable = document.getElementById("revealTable");
-    revealTable.innerHTML = "";
-
-    const headerRow = document.createElement("tr");
-    for (const key of sharedObjects.displayKeys) {
-      const th = document.createElement("th");
-      th.textContent = key;
-      headerRow.appendChild(th);
-    }
-    revealTable.appendChild(headerRow);
-
-    const row = document.createElement("tr");
-    for (const key of sharedObjects.displayKeys) {
-      const td = document.createElement("td");
-      const val = sharedObjects.flatTarget[key];
-      td.textContent = Array.isArray(val) ? abbreviateCategories(val) : val;
-      td.classList.add("match");
-      row.appendChild(td);
-    }
-    revealTable.appendChild(row);
-    revealTable.style.display = "table";
+    const toprow = document
+      .getElementById("resultsTable")
+      .querySelector("tr").children;
+    sharedObjects.displayKeys.forEach((key, index) => {
+      const td = toprow[index];
+      if (!td.classList.contains("match") && !td.classList.contains("close")) {
+        const val = sharedObjects.flatTarget[key];
+        td.classList.add("fail");
+        td.textContent = Array.isArray(val) ? abbreviateCategories(val) : val;
+      }
+    });
   });
 }
 
