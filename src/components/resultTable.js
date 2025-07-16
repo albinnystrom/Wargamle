@@ -9,13 +9,14 @@ import { compareVals, getClose } from "../utils/closeness.js";
 import { abbreviateCategories } from "../utils/formatting.js";
 
 const guessedCountries = [];
+let notCoals = [];
 
 function countryKnown(td, key, coals) {
   if (coals.length == 1) {
-    const onlyOne =
-      coalitionToCountry[coals[0]].filter((c) => !guessedCountries.includes(c))
-        .length == 1;
-    if (onlyOne) {
+    const possible = coalitionToCountry[coals[0]].filter(
+      (c) => !guessedCountries.includes(c)
+    );
+    if (possible.length == 1 && possible[0] == sharedObjects.targetUnit[key]) {
       td.classList.add("match");
       td.textContent = sharedObjects.targetUnit[key];
     }
@@ -93,21 +94,23 @@ export function updateSummaryVals(td, key, guessUnit, isClose) {
     guessedCountries.push(guessVal);
     const coal = guessUnit["coalition"];
     let next = null;
+    if (!isClose) {
+      notCoals = notCoals.concat(coal);
+    }
     if (td.classList.contains("close")) {
       const prev = td.textContent.replace("In ", "").split(" or ");
       if (isClose) {
-        next = prev.filter((c) => coal.includes(c));
+        next = prev.filter((c) => coal.includes(c) && !notCoals.includes(c));
         td.textContent = `In ${next.join(" or ")}`;
       } else {
-        next = prev.filter((c) => !coal.includes(c));
+        next = prev.filter((c) => !coal.includes(c) && !notCoals.includes(c));
         td.textContent = `In ${next.join(" or ")}`;
-        console.log("here");
       }
 
       countryKnown(td, key, next);
       return;
     }
-    next = coal;
+    next = coal.filter((c) => !notCoals.includes(c));
     //First time, just add coals
     if (isClose) {
       td.textContent = `In ${next.join(" or ")}`;
