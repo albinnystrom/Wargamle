@@ -1,7 +1,26 @@
 import { sharedObjects } from "../shared/sharedObjects.js";
-import { skipKeys, catTooltips, summaryVals } from "../utils/constants.js";
+import {
+  skipKeys,
+  catTooltips,
+  summaryVals,
+  coalitionToCountry,
+} from "../utils/constants.js";
 import { compareVals, getClose } from "../utils/closeness.js";
 import { abbreviateCategories } from "../utils/formatting.js";
+
+const guessedCountries = [];
+
+function countryKnown(td, key, coals) {
+  if (coals.length == 1) {
+    const onlyOne =
+      coalitionToCountry[coals[0]].filter((c) => !guessedCountries.includes(c))
+        .length == 1;
+    if (onlyOne) {
+      td.classList.add("match");
+      td.textContent(key);
+    }
+  }
+}
 
 export function initializeTable() {
   const table = document.getElementById("resultsTable");
@@ -42,7 +61,8 @@ export function initializeTable() {
   table.appendChild(headerRow);
 }
 
-export function updateSummaryVals(td, key, guessVal, isClose) {
+export function updateSummaryVals(td, key, guessUnit, isClose) {
+  let guessVal = guessUnit[key];
   guessVal = !isNaN(Number(guessVal)) ? Number(guessVal) : guessVal;
 
   // Return if not dynamic summaryval
@@ -53,10 +73,6 @@ export function updateSummaryVals(td, key, guessVal, isClose) {
   // Already matched. Skip.
   if (td.classList.contains("match")) {
     return;
-  }
-
-  if (isClose) {
-    td.classList.add("close");
   }
 
   // Categories and country handled separately
@@ -74,12 +90,30 @@ export function updateSummaryVals(td, key, guessVal, isClose) {
   }
 
   if (key == "country") {
-    if (isClose) {
-      td.textContent = `In ${sharedObjects.targetUnit.coalition.join(" or ")}`;
+    guessedCountries.push(key);
+    const coal = guessUnit["coalition"];
+    if (td.classList.contains("close")) {
+      const prev = td.textContent.split(" or ");
+      if (isClose) {
+        const next = prev.filter((c) => coal.includes(c));
+        td.textContent = `${next.join(" or ")}`;
+      } else {
+        const next = prev.filter((c) => coal.includes(c));
+        td.textContent = `${next.join(" or ")}`;
+        console.log("here");
+      }
+
+      countryKnown(td, key, coal);
+      return;
     }
+
+    //First time, just add coals
+    if (isClose) {
+      td.textContent = `In ${coal.join(" or ")}`;
+    }
+    countryKnown(td, key, coal);
     return;
   }
-
   let rng = null;
   if (isClose) {
     rng = getClose(key, guessVal);
@@ -89,15 +123,12 @@ export function updateSummaryVals(td, key, guessVal, isClose) {
     rng = [lwr, upr];
   }
 
-  console.log(rng);
-
   //lower bound
   if (
     (compareVals(key, rng[0], summaryVals[key][0]) || //if bigger than current
       summaryVals[key][0] == "?") && //or not yet filled
     (!compareVals(key, guessVal, sharedObjects.targetUnit[key]) || isClose) //and not bigger than target
   ) {
-    console.log("updated lower");
     summaryVals[key][0] = rng[0];
   }
 
@@ -107,7 +138,6 @@ export function updateSummaryVals(td, key, guessVal, isClose) {
       summaryVals[key][1] == "?") && //or not yet filled
     (compareVals(key, guessVal, sharedObjects.targetUnit[key]) || isClose) //and (smaller than target or isClose)
   ) {
-    console.log("updated upper");
     summaryVals[key][1] = rng[1];
   }
 
@@ -116,7 +146,6 @@ export function updateSummaryVals(td, key, guessVal, isClose) {
     td.classList.contains("close") &&
     getClose(key, summaryVals[key][0]).includes(summaryVals[key][1])
   ) {
-    console.log("if1");
     td.textContent = `${sharedObjects.targetUnit[key]}`;
     td.classList.add("match");
     return;

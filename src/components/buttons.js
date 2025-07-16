@@ -115,14 +115,14 @@ export function initializeSearch() {
         );
 
         if (!summaryRow.classList.contains("match")) {
-          updateSummaryVals(summaryRow, key, guessVal, true);
+          updateSummaryVals(summaryRow, key, flatUnit, true);
 
           summaryRow.classList.add("close");
         }
         // Handle not close (give hint)
       } else {
         td.textContent = upOrDown(key, guessVal, targetVal) + td.textContent;
-        updateSummaryVals(summaryRow, key, guessVal, false);
+        updateSummaryVals(summaryRow, key, flatUnit, false);
       }
 
       row.appendChild(td);
