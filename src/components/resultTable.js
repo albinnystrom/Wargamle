@@ -17,7 +17,7 @@ function countryKnown(td, key, coals) {
         .length == 1;
     if (onlyOne) {
       td.classList.add("match");
-      td.textContent(key);
+      td.textContent = sharedObjects.targetUnit[key];
     }
   }
 }
@@ -90,28 +90,29 @@ export function updateSummaryVals(td, key, guessUnit, isClose) {
   }
 
   if (key == "country") {
-    guessedCountries.push(key);
+    guessedCountries.push(guessVal);
     const coal = guessUnit["coalition"];
+    let next = null;
     if (td.classList.contains("close")) {
-      const prev = td.textContent.split(" or ");
+      const prev = td.textContent.replace("In ", "").split(" or ");
       if (isClose) {
-        const next = prev.filter((c) => coal.includes(c));
-        td.textContent = `${next.join(" or ")}`;
+        next = prev.filter((c) => coal.includes(c));
+        td.textContent = `In ${next.join(" or ")}`;
       } else {
-        const next = prev.filter((c) => coal.includes(c));
-        td.textContent = `${next.join(" or ")}`;
+        next = prev.filter((c) => !coal.includes(c));
+        td.textContent = `In ${next.join(" or ")}`;
         console.log("here");
       }
 
-      countryKnown(td, key, coal);
+      countryKnown(td, key, next);
       return;
     }
-
+    next = coal;
     //First time, just add coals
     if (isClose) {
-      td.textContent = `In ${coal.join(" or ")}`;
+      td.textContent = `In ${next.join(" or ")}`;
     }
-    countryKnown(td, key, coal);
+    countryKnown(td, key, next);
     return;
   }
   let rng = null;
@@ -141,17 +142,29 @@ export function updateSummaryVals(td, key, guessUnit, isClose) {
     summaryVals[key][1] = rng[1];
   }
 
-  //If is close and range is adjacent, correct value can be derived.
+  let isMatch = false;
+  //If upper bound is lowest possible and vice verca
   if (
+    (!isMatch &&
+      getClose(key, summaryVals[key][0])[1] == summaryVals[key][0]) ||
+    getClose(key, summaryVals[key][1])[0] == summaryVals[key][1]
+  ) {
+    isMatch = true;
+  }
+  if (
+    !isMatch &&
     td.classList.contains("close") &&
     getClose(key, summaryVals[key][0]).includes(summaryVals[key][1])
   ) {
-    td.textContent = `${sharedObjects.targetUnit[key]}`;
-    td.classList.add("match");
-    return;
+    //If is close and range is adjacent, correct value can be derived.
+    isMatch = true;
   }
-  if (summaryVals[key][0] === summaryVals[key][1]) {
-    //If both bounds ==, correct value found
+  //If both bounds ==, correct value found
+  if (!isMatch && summaryVals[key][0] === summaryVals[key][1]) {
+    isMatch = true;
+  }
+
+  if (isMatch) {
     td.textContent = `${sharedObjects.targetUnit[key]}`;
     td.classList.add("match");
     return;
