@@ -8,9 +8,9 @@ output = []
 def coalition(country):
     coalitions = {
         "United Kingdom": ["Commonwealth"],
-        "Canada": ["Commonwealth", "Norad"],
+        "Canada": ["Commonwealth", "NORAD"],
         "ANZAC": ["Commonwealth"],
-        "West Germany": ["Eurocorps", "LANDJUT", "Duth-German Corps"],
+        "West Germany": ["Eurocorps", "LANDJUT", "Dutch-German Corps"],
         "France": ["Eurocorps"],
         "Norway": ["Scandinavia"],
         "Denmark": ["Scandinavia", "LANDJUT"],
@@ -18,7 +18,7 @@ def coalition(country):
         "Japan": ["Blue Dragons"],
         "South Korea": ["Blue Dragons"],
         "United States": ["NORAD"],
-        "The Netherlands": ["Duth-German Corps"],
+        "The Netherlands": ["Dutch-German Corps"],
         "Poland": ["Eastern Bloc", "Baltic Front"],
         "Czechoslavakia": ["Eastern Bloc", "Entente"],
         "East Germany": ["Eastern Bloc"],
