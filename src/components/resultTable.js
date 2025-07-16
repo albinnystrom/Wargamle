@@ -55,6 +55,10 @@ export function updateSummaryVals(td, key, guessVal, isClose) {
     return;
   }
 
+  if (isClose) {
+    td.classList.add("close");
+  }
+
   // Categories and country handled separately
   if (key == "categories") {
     if (isClose) {
@@ -76,57 +80,54 @@ export function updateSummaryVals(td, key, guessVal, isClose) {
     return;
   }
 
-  // If already close, check if only one possible value. If so mark as correct.
-  if (td.classList.contains("close")) {
-    if (isClose) {
-      const lims = getClose(key, guessVal);
-      if (summaryVals[key][0] == lims[1]) {
-        td.textContent = summaryVals[key][0];
-        td.classList.add("match");
-        return;
-      }
-      if (summaryVals[key][1] == lims[0]) {
-        td.textContent = summaryVals[key][1];
-        td.classList.add("match");
-        return;
-      }
-    }
-
-    // Check if excludes other part of interval
-    if (summaryVals[key][0] == guessVal) {
-      td.textContent = summaryVals[key][1];
-      td.classList.add("match");
-      return;
-    }
-    if (summaryVals[key][1] == guessVal) {
-      td.textContent = summaryVals[key][0];
-      td.classList.add("match");
-      return;
-    }
-    return;
-  }
-
-  // Update with interval if close
+  let rng = null;
   if (isClose) {
-    summaryVals[key] = getClose(key, guessVal);
-    td.textContent = summaryVals[key].join(" - ");
+    rng = getClose(key, guessVal);
+  } else {
+    let lwr = getClose(key, getClose(key, guessVal)[1])[1];
+    let upr = getClose(key, getClose(key, guessVal)[0])[0];
+    rng = [lwr, upr];
+  }
+
+  console.log(rng);
+
+  //lower bound
+  if (
+    (compareVals(key, rng[0], summaryVals[key][0]) || //if bigger than current
+      summaryVals[key][0] == "?") && //or not yet filled
+    (!compareVals(key, guessVal, sharedObjects.targetUnit[key]) || isClose) //and not bigger than target
+  ) {
+    console.log("updated lower");
+    summaryVals[key][0] = rng[0];
+  }
+
+  //upper bound
+  if (
+    (compareVals(key, summaryVals[key][1], rng[1]) || //if smaller than current
+      summaryVals[key][1] == "?") && //or not yet filled
+    (compareVals(key, guessVal, sharedObjects.targetUnit[key]) || isClose) //and (smaller than target or isClose)
+  ) {
+    console.log("updated upper");
+    summaryVals[key][1] = rng[1];
+  }
+
+  //If is close and range is adjacent, correct value can be derived.
+  if (
+    td.classList.contains("close") &&
+    getClose(key, summaryVals[key][0]).includes(summaryVals[key][1])
+  ) {
+    console.log("if1");
+    td.textContent = `${sharedObjects.targetUnit[key]}`;
+    td.classList.add("match");
+    return;
+  }
+  if (summaryVals[key][0] === summaryVals[key][1]) {
+    //If both bounds ==, correct value found
+    td.textContent = `${sharedObjects.targetUnit[key]}`;
+    td.classList.add("match");
     return;
   }
 
-  if (
-    (compareVals(key, guessVal, summaryVals[key][0]) ||
-      summaryVals[key][0] == "?") &&
-    !compareVals(key, guessVal, sharedObjects.targetUnit[key])
-  ) {
-    summaryVals[key][0] = guessVal;
-  }
-  if (
-    (!compareVals(key, guessVal, summaryVals[key][1]) ||
-      summaryVals[key][1] == "?") &&
-    compareVals(key, guessVal, sharedObjects.targetUnit[key])
-  ) {
-    summaryVals[key][1] = guessVal;
-  }
-
+  //If nothing else, update values
   td.textContent = `${summaryVals[key][0]} - ${summaryVals[key][1]}`;
 }
