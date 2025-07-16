@@ -174,3 +174,17 @@ export const ordinalCats = [
   "stealth",
   "size",
 ];
+
+export const coalitionToCountry = {
+  Commonwealth: ["United Kingdom", "Canada", "ANZAC"],
+  NORAD: ["Canada", "United States"],
+  Eurocorps: ["West Germany", "France"],
+  LANDJUT: ["West Germany", "Denmark"],
+  "Dutch-German Corps": ["West Germany", "The Netherlands"],
+  Scandinavia: ["Norway", "Denmark", "Sweden"],
+  "Blue Dragons": ["South Korea"],
+  "Eastern Bloc": ["Poland", "Czechoslavakia"],
+  "Baltic Front": ["Poland", "Finland"],
+  Entente: ["Czechoslavakia", "Yugoslavia"],
+  "Red Dragons": ["China", "North Korea"],
+};

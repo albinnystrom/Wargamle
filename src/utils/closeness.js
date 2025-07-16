@@ -33,7 +33,6 @@ export function getClose(key, guessVal) {
   if (key == "year") {
     return [guessVal - 1, guessVal + 1];
   }
-  console.log(key);
   const idx = closenessSets[key].indexOf(String(guessVal));
 
   const set = closenessSets[key];
