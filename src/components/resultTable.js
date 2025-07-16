@@ -155,11 +155,16 @@ export function updateSummaryVals(td, key, guessUnit, isClose) {
   let isMatch = false;
   const uppr = summaryVals[key][0];
   const lwr = summaryVals[key][1];
-  //If upper bound is lowest possible and vice verca
+
+  //If close and edge, correct value can be derived.
+  if (!isMatch && isClose && getClose(key, guessVal).includes(guessVal)) {
+    isMatch = true;
+  }
   if (
     (!isMatch && getClose(key, uppr)[1] == uppr) ||
     getClose(key, lwr)[0] == lwr
   ) {
+    //If upper bound is lowest possible and vice verca
     isMatch = true;
   }
   if (
