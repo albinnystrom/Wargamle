@@ -115,6 +115,13 @@ export function updateSummaryVals(td, key, guessUnit, isClose) {
     countryKnown(td, key, next);
     return;
   }
+  if (key.includes("weapon")) {
+    if (isClose) {
+      td.textContent = guessUnit[key + "_type"];
+    }
+    return;
+  }
+
   let rng = null;
   if (isClose) {
     rng = getClose(key, guessVal);
@@ -143,24 +150,25 @@ export function updateSummaryVals(td, key, guessUnit, isClose) {
   }
 
   let isMatch = false;
+  const uppr = summaryVals[key][0];
+  const lwr = summaryVals[key][1];
   //If upper bound is lowest possible and vice verca
   if (
-    (!isMatch &&
-      getClose(key, summaryVals[key][0])[1] == summaryVals[key][0]) ||
-    getClose(key, summaryVals[key][1])[0] == summaryVals[key][1]
+    (!isMatch && getClose(key, uppr)[1] == uppr) ||
+    getClose(key, lwr)[0] == lwr
   ) {
     isMatch = true;
   }
   if (
     !isMatch &&
     td.classList.contains("close") &&
-    getClose(key, summaryVals[key][0]).includes(summaryVals[key][1])
+    getClose(key, uppr).includes(lwr)
   ) {
     //If is close and range is adjacent, correct value can be derived.
     isMatch = true;
   }
   //If both bounds ==, correct value found
-  if (!isMatch && summaryVals[key][0] === summaryVals[key][1]) {
+  if (!isMatch && uppr === lwr) {
     isMatch = true;
   }
 
@@ -171,5 +179,5 @@ export function updateSummaryVals(td, key, guessUnit, isClose) {
   }
 
   //If nothing else, update values
-  td.textContent = `${summaryVals[key][0]} - ${summaryVals[key][1]}`;
+  td.textContent = `${uppr} - ${lwr}`;
 }

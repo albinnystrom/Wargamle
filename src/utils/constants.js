@@ -162,6 +162,9 @@ export const summaryVals = {
   stealth: ["?", "?"],
   size: ["?", "?"],
   categories: [],
+  weapon1: null,
+  weapon2: null,
+  weapon3: null,
 };
 
 export const ordinalCats = [
