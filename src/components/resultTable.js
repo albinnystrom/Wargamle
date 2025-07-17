@@ -160,21 +160,24 @@ export function updateSummaryVals(td, key, guessUnit, isClose) {
   if (!isMatch && isClose && getClose(key, guessVal).includes(guessVal)) {
     isMatch = true;
   }
+
+  //If upper bound is lowest possible and vice verca
   if (
     (!isMatch && getClose(key, uppr)[1] == uppr) ||
     getClose(key, lwr)[0] == lwr
   ) {
-    //If upper bound is lowest possible and vice verca
     isMatch = true;
   }
+
+  //If is close and range is adjacent, correct value can be derived.
   if (
     !isMatch &&
     td.classList.contains("close") &&
     getClose(key, uppr).includes(lwr)
   ) {
-    //If is close and range is adjacent, correct value can be derived.
     isMatch = true;
   }
+
   //If both bounds ==, correct value found
   if (!isMatch && uppr === lwr) {
     isMatch = true;
