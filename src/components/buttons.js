@@ -200,7 +200,7 @@ export function initializeShareBtn() {
   const btn = document.getElementById("shareBtn");
   btn.addEventListener("click", () => {
     const table = document.getElementById("resultsTable");
-    const today = new Date();
+    const today = new Date(document.getElementById("datePicker").value);
     const options = { year: "numeric", month: "long", day: "numeric" };
     const formattedDate = today.toLocaleDateString(undefined, options);
     const headerLine = `WARGAMle ${formattedDate}`;
