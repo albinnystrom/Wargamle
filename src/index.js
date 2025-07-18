@@ -1,5 +1,9 @@
 import { sharedObjects } from "./shared/sharedObjects.js";
-import { initializeGiveUpBtn, initializeSearch } from "./components/buttons.js";
+import {
+  initializeGiveUpBtn,
+  initializeSearch,
+  initializeShareBtn,
+} from "./components/buttons.js";
 import { flatten } from "./utils/formatting.js";
 import { initializeSearchBox } from "./components/searchbox.js";
 import { pickTarget } from "./utils/randomgen.js";
@@ -23,5 +27,6 @@ document.addEventListener("DOMContentLoaded", () => {
       initializeGiveUpBtn();
       initializeSearchBox();
       initializeSearch();
+      initializeShareBtn();
     });
 });
