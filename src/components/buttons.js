@@ -195,3 +195,45 @@ toggle.addEventListener("change", () => {
   }
   location.reload();
 });
+
+export function initializeShareBtn() {
+  const btn = document.getElementById("shareBtn");
+  btn.addEventListener("click", () => {
+    const table = document.getElementById("resultsTable");
+    const today = new Date();
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    const formattedDate = today.toLocaleDateString(undefined, options);
+    const headerLine = `WARGAMle ${formattedDate}`;
+    const emojiHeader = "🌍 🗂️ 📅 💰 🏃 💪 ⛽ 📏 🔭 🕵️ 🔫 🧨 🎯 🧩";
+    let tableString = headerLine + "\n" + emojiHeader + "\n";
+
+    for (let i = 2; i < table.rows.length; i++) {
+      const row = table.rows[i];
+      let rowString = "";
+      for (let j = 1; j < row.cells.length; j++) {
+        const cell = row.cells[j];
+        if (cell.classList.contains("match")) {
+          rowString += "🟩 ";
+        } else if (cell.classList.contains("close")) {
+          rowString += "🟨 ";
+        } else {
+          rowString += "⬜ ";
+        }
+      }
+      const label = row.cells[0].textContent.trim();
+      rowString += " ||" + label + "||";
+      tableString += rowString + "\n";
+    }
+
+    navigator.clipboard
+      .writeText(tableString)
+      .then(() => {
+        console.log(`Copied to clipboard!\n${tableString}`);
+      })
+      .catch((err) => {
+        console.error(`Clipboard write failed:\n${tableString}`, err);
+      });
+
+    btn.textContent = "Copied to clipboard";
+  });
+}
