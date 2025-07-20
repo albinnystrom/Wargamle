@@ -93,12 +93,12 @@ export function updateSummaryVals(td, key, guessUnit, isClose) {
   if (key == "country") {
     guessedCountries.push(guessVal);
     const coal = guessUnit["coalition"];
+    const prev = td.textContent.replace("In ", "").split(" or ");
     let next = null;
     if (!isClose) {
       notCoals = notCoals.concat(coal);
     }
-    if (td.classList.contains("close")) {
-      const prev = td.textContent.replace("In ", "").split(" or ");
+    if (td.classList.contains("close") && !prev.includes("?")) {
       if (isClose) {
         next = prev.filter((c) => coal.includes(c) && !notCoals.includes(c));
         td.textContent = `In ${next.join(" or ")}`;

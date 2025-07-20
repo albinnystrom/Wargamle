@@ -115,9 +115,8 @@ export function initializeSearch() {
         );
 
         if (!summaryRow.classList.contains("match")) {
-          updateSummaryVals(summaryRow, key, flatUnit, true);
-
           summaryRow.classList.add("close");
+          updateSummaryVals(summaryRow, key, flatUnit, true);
         }
         // Handle not close (give hint)
       } else {
