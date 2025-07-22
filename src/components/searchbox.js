@@ -26,6 +26,35 @@ function getMatchScore(unitName, query) {
   return 0;
 }
 
+function updateDrowndown(units) {
+  sharedObjects.list.innerHTML = "";
+  sharedObjects.highlightedIndex = -1;
+  currentSuggestions = units;
+  currentSuggestions.forEach((match, index) => {
+    const div = document.createElement("autocomplete-item");
+
+    const flagImg = document.createElement("img");
+    const countryFile = match.country.toLowerCase().replace(/\s+/g, "_");
+    flagImg.src = `images/flags/${countryFile}.webp`;
+    flagImg.classList.add("flagIcon");
+
+    const nameSpan = document.createElement("span");
+    nameSpan.textContent = match.name;
+
+    div.appendChild(flagImg);
+    div.appendChild(nameSpan);
+
+    div.dataset.index = index;
+    div.classList.add("autocomplete-item");
+    div.addEventListener("mousedown", () => {
+      sharedObjects.input.value = match.name;
+      sharedObjects.list.innerHTML = "";
+      sharedObjects.selectedUnit = match; // ✅ store exact match
+    });
+    sharedObjects.list.appendChild(div);
+  });
+}
+
 export function initializeSearchBox() {
   sharedObjects.input.addEventListener("keydown", (e) => {
     const items = sharedObjects.list.querySelectorAll(".autocomplete-item");
@@ -70,48 +99,26 @@ export function initializeSearchBox() {
     }
   });
 
+  sharedObjects.input.addEventListener("click", () => {
+    updateDrowndown(filterUnits(sharedObjects.units));
+  });
+
   sharedObjects.input.addEventListener("input", () => {
     const query = sharedObjects.input.value.toLowerCase().trim();
     sharedObjects.list.innerHTML = "";
     sharedObjects.highlightedIndex = -1;
 
-    if (query.length === 0) {
-      currentSuggestions = [];
-      return;
-    }
     const filteredUnits = filterUnits(sharedObjects.units);
-    currentSuggestions = filteredUnits
-      .map((u) => ({
-        unit: u,
-        score: getMatchScore(u.name, query),
-      }))
-      .filter((entry) => entry.score > 0)
-      .sort((a, b) => b.score - a.score)
-      .map((entry) => entry.unit);
-
-    currentSuggestions.forEach((match, index) => {
-      const div = document.createElement("autocomplete-item");
-
-      const flagImg = document.createElement("img");
-      const countryFile = match.country.toLowerCase().replace(/\s+/g, "_");
-      flagImg.src = `images/flags/${countryFile}.webp`;
-      flagImg.classList.add("flagIcon");
-
-      const nameSpan = document.createElement("span");
-      nameSpan.textContent = match.name;
-
-      div.appendChild(flagImg);
-      div.appendChild(nameSpan);
-
-      div.dataset.index = index;
-      div.classList.add("autocomplete-item");
-      div.addEventListener("mousedown", () => {
-        sharedObjects.input.value = match.name;
-        sharedObjects.list.innerHTML = "";
-        sharedObjects.selectedUnit = match; // ✅ store exact match
-      });
-      sharedObjects.list.appendChild(div);
-    });
+    updateDrowndown(
+      filteredUnits
+        .map((u) => ({
+          unit: u,
+          score: getMatchScore(u.name, query),
+        }))
+        .filter((entry) => entry.score > 0)
+        .sort((a, b) => b.score - a.score)
+        .map((entry) => entry.unit)
+    );
   });
   document.addEventListener("click", (e) => {
     if (!sharedObjects.input.contains(e.target))
