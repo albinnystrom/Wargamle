@@ -8,8 +8,8 @@ import {
 import { compareVals, getClose } from "../utils/closeness.js";
 import { abbreviateCategories } from "../utils/formatting.js";
 
-const guessedCountries = [];
-let notCoals = [];
+export const guessedCountries = [];
+export let notCoals = [];
 
 function countryKnown(td, key, coals) {
   if (coals.length == 1) {
@@ -19,6 +19,7 @@ function countryKnown(td, key, coals) {
     if (possible.length == 1 && possible[0] == sharedObjects.targetUnit[key]) {
       td.classList.add("match");
       td.textContent = sharedObjects.targetUnit[key];
+      delete guessedCountries[guessedCountries.indexOf(td.textContent)];
     }
   }
 }
@@ -34,13 +35,16 @@ export function initializeTable() {
   const headerRow = document.createElement("tr");
   const guessRow = document.createElement("tr");
   for (const key of sharedObjects.displayKeys) {
+    //category row
     const th = document.createElement("th");
-    const td = document.createElement("td");
-
     th.textContent = key;
     th.classList.add("tooltip");
     th.setAttribute("data-tooltip", catTooltips[key]);
+
+    //summary row
+    const td = document.createElement("td");
     td.textContent = "?";
+    td.dataset.key = key;
 
     headerRow.appendChild(th);
     guessRow.appendChild(td);
@@ -57,6 +61,10 @@ export function initializeTable() {
         document.getElementById("infoBox").style.display = "none";
       }
     });
+
+    if (key != "name") {
+      th.addEventListener("click", () => th.classList.toggle("pressed"));
+    }
   }
   table.appendChild(guessRow);
   table.appendChild(headerRow);

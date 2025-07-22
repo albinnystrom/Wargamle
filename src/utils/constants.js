@@ -7,6 +7,7 @@ export const skipKeys = new Set([
 
 export const closenessSets = {
   autonomy: [
+    "N/A",
     "60",
     "75",
     "90",

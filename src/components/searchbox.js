@@ -1,5 +1,6 @@
 import { normalizeString } from "../utils/formatting.js";
 import { sharedObjects } from "../shared/sharedObjects.js";
+import { filterUnits } from "../utils/filter.js";
 
 let currentSuggestions = [];
 
@@ -78,8 +79,8 @@ export function initializeSearchBox() {
       currentSuggestions = [];
       return;
     }
-
-    currentSuggestions = sharedObjects.units
+    const filteredUnits = filterUnits(sharedObjects.units);
+    currentSuggestions = filteredUnits
       .map((u) => ({
         unit: u,
         score: getMatchScore(u.name, query),
@@ -89,23 +90,12 @@ export function initializeSearchBox() {
       .map((entry) => entry.unit);
 
     currentSuggestions.forEach((match, index) => {
-      const div = document.createElement("div");
-      div.className = "autocomplete-item";
-      div.style.display = "flex";
-      div.style.alignItems = "center";
-      div.style.gap = "0.5rem";
-      div.style.padding = "0.5rem";
-      div.style.cursor = "pointer";
+      const div = document.createElement("autocomplete-item");
 
       const flagImg = document.createElement("img");
       const countryFile = match.country.toLowerCase().replace(/\s+/g, "_");
       flagImg.src = `images/flags/${countryFile}.webp`;
-      flagImg.alt = match.country;
-      flagImg.style.width = "20px";
-      flagImg.style.height = "14px";
-      flagImg.style.objectFit = "cover";
-      flagImg.style.border = "1px solid #ccc";
-      flagImg.style.borderRadius = "2px";
+      flagImg.classList.add("flagIcon");
 
       const nameSpan = document.createElement("span");
       nameSpan.textContent = match.name;

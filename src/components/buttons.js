@@ -7,6 +7,7 @@ import { isClose, upOrDown } from "../utils/closeness.js";
 import { closenessSets } from "../utils/constants.js";
 import { sharedObjects } from "../shared/sharedObjects.js";
 import { updateSummaryVals } from "./resultTable.js";
+import { notVals } from "../utils/filter.js";
 
 function getTooltip(key, guessVal, guessUnit, targetUnit) {
   if (key == "price") {
@@ -120,10 +121,12 @@ export function initializeSearch() {
         }
         // Handle not close (give hint)
       } else {
+        if (key in notVals) {
+          notVals[key].push(guessVal);
+        }
         td.textContent = upOrDown(key, guessVal, targetVal) + td.textContent;
         updateSummaryVals(summaryRow, key, flatUnit, false);
       }
-
       row.appendChild(td);
 
       sharedObjects.input.value = "";

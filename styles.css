@@ -118,6 +118,11 @@ th {
   background-color: #efd8bb;
 }
 
+th.pressed {
+  box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.2), inset -2px -2px 5px #ecd3b4;
+  background-color: #ecd3b4;
+}
+
 tr {
   padding: auto;
 }
@@ -212,7 +217,13 @@ h1 {
   display: none;
   /* hidden by default */
 }
-
+.autocomplete-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  cursor: pointer;
+}
 .autocomplete-item:hover,
 .autocomplete-item.highlight {
   background-color: #e0eaff;
@@ -314,4 +325,12 @@ img.logo {
   border-radius: 8px;
   align-self: center;
   margin-bottom: 1rem;
+}
+
+img.flagIcon {
+  width: 20px;
+  height: 14px;
+  object-fit: cover;
+  border: 1px solid #ccc;
+  border-radius: 2px;
 }
