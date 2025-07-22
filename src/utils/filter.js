@@ -72,7 +72,7 @@ function keyFilter(key, units) {
     if (td.classList.contains("match")) {
       return units.filter((u) =>
         isSubset(
-          summaryVals[key],
+          td.textContent.split(", "),
           abbreviateCategories(u.categories).split(", "),
           true
         )
@@ -81,7 +81,7 @@ function keyFilter(key, units) {
     if (td.classList.contains("close")) {
       return units.filter((u) =>
         isSubset(
-          summaryVals[key],
+          td.textContent.split(", "),
           abbreviateCategories(u.categories).split(", "),
           false
         )
