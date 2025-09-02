@@ -53,15 +53,6 @@ export function pickTarget(units) {
 }
 
 function getUnitFromDate(units, date, previousTargets, store) {
-  // Removes entries more than a year from the date
-  if (store) {
-    previousTargets = Object.fromEntries(
-      Object.entries(previousTargets).filter(([key]) => {
-        const keyDate = parseISO(key);
-        return differenceInYears(date, keyDate) < 1;
-      })
-    );
-  }
   const storageKey = "wgrdle_previous_targets";
 
   const dateStr = date.toISOString().split("T")[0];
@@ -72,6 +63,16 @@ function getUnitFromDate(units, date, previousTargets, store) {
   const prevDay = subDays(date, 1);
   if (!(prevDay.toISOString().split("T")[0] in previousTargets)) {
     getUnitFromDate(units, prevDay, previousTargets, false);
+  }
+
+  // Removes entries more than a year from the date
+  if (store) {
+    previousTargets = Object.fromEntries(
+      Object.entries(previousTargets).filter(([key]) => {
+        const keyDate = parseISO(key);
+        return differenceInYears(date, keyDate) < 1;
+      })
+    );
   }
 
   let seed = getDateSeed(date);
