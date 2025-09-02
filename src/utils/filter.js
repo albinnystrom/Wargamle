@@ -64,7 +64,6 @@ function keyFilter(key, units) {
     if (td.classList.contains("match")) {
       return units.filter((u) => u.tab == td.textContent);
     }
-    console.log(notVals[key]);
     return units.filter((u) => !notVals[key].includes(u[key]));
   }
 
@@ -100,7 +99,6 @@ function keyFilter(key, units) {
   }
 
   if (key in closenessSets) {
-    console.log("closness");
     if (td.classList.contains("match")) {
       return units.filter((u) => u[key] == td.textContent);
     }
@@ -109,7 +107,6 @@ function keyFilter(key, units) {
       summaryVals[key][0] != "?" ? set.indexOf(summaryVals[key][0]) : -1;
     const upr =
       summaryVals[key][1] != "?" ? set.indexOf(summaryVals[key][1]) : 1000;
-    console.log(`lwr=${lwr}, upr=${upr}`);
     return units.filter(
       (u) => set.indexOf(u[key]) >= lwr && set.indexOf(u[key]) <= upr
     );
