@@ -7,6 +7,7 @@ export const skipKeys = new Set([
 
 export const closenessSets = {
   autonomy: [
+    "N/A",
     "60",
     "75",
     "90",
@@ -191,3 +192,8 @@ export const coalitionToCountry = {
   Entente: ["Czechoslavakia", "Yugoslavia"],
   "Red Dragons": ["China", "North Korea"],
 };
+
+export const firstTarget = {
+  "2025-07-09": { idx: 337, name: "Eland 60", date: "2025-07-09" },
+};
+export const firstDate = new Date(2025, 7, 9);

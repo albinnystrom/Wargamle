@@ -1,5 +1,6 @@
 import { normalizeString } from "../utils/formatting.js";
 import { sharedObjects } from "../shared/sharedObjects.js";
+import { filterUnits } from "../utils/filter.js";
 
 let currentSuggestions = [];
 
@@ -23,6 +24,35 @@ function getMatchScore(unitName, query) {
     return 70;
 
   return 0;
+}
+
+function updateDrowndown(units) {
+  sharedObjects.list.innerHTML = "";
+  sharedObjects.highlightedIndex = -1;
+  currentSuggestions = units;
+  currentSuggestions.forEach((match, index) => {
+    const div = document.createElement("autocomplete-item");
+
+    const flagImg = document.createElement("img");
+    const countryFile = match.country.toLowerCase().replace(/\s+/g, "_");
+    flagImg.src = `images/flags/${countryFile}.webp`;
+    flagImg.classList.add("flagIcon");
+
+    const nameSpan = document.createElement("span");
+    nameSpan.textContent = match.name;
+
+    div.appendChild(flagImg);
+    div.appendChild(nameSpan);
+
+    div.dataset.index = index;
+    div.classList.add("autocomplete-item");
+    div.addEventListener("mousedown", () => {
+      sharedObjects.input.value = match.name;
+      sharedObjects.list.innerHTML = "";
+      sharedObjects.selectedUnit = match; // ✅ store exact match
+    });
+    sharedObjects.list.appendChild(div);
+  });
 }
 
 export function initializeSearchBox() {
@@ -69,59 +99,26 @@ export function initializeSearchBox() {
     }
   });
 
+  sharedObjects.input.addEventListener("click", () => {
+    updateDrowndown(filterUnits(sharedObjects.units));
+  });
+
   sharedObjects.input.addEventListener("input", () => {
     const query = sharedObjects.input.value.toLowerCase().trim();
     sharedObjects.list.innerHTML = "";
     sharedObjects.highlightedIndex = -1;
 
-    if (query.length === 0) {
-      currentSuggestions = [];
-      return;
-    }
-
-    currentSuggestions = sharedObjects.units
-      .map((u) => ({
-        unit: u,
-        score: getMatchScore(u.name, query),
-      }))
-      .filter((entry) => entry.score > 0)
-      .sort((a, b) => b.score - a.score)
-      .map((entry) => entry.unit);
-
-    currentSuggestions.forEach((match, index) => {
-      const div = document.createElement("div");
-      div.className = "autocomplete-item";
-      div.style.display = "flex";
-      div.style.alignItems = "center";
-      div.style.gap = "0.5rem";
-      div.style.padding = "0.5rem";
-      div.style.cursor = "pointer";
-
-      const flagImg = document.createElement("img");
-      const countryFile = match.country.toLowerCase().replace(/\s+/g, "_");
-      flagImg.src = `images/flags/${countryFile}.webp`;
-      flagImg.alt = match.country;
-      flagImg.style.width = "20px";
-      flagImg.style.height = "14px";
-      flagImg.style.objectFit = "cover";
-      flagImg.style.border = "1px solid #ccc";
-      flagImg.style.borderRadius = "2px";
-
-      const nameSpan = document.createElement("span");
-      nameSpan.textContent = match.name;
-
-      div.appendChild(flagImg);
-      div.appendChild(nameSpan);
-
-      div.dataset.index = index;
-      div.classList.add("autocomplete-item");
-      div.addEventListener("mousedown", () => {
-        sharedObjects.input.value = match.name;
-        sharedObjects.list.innerHTML = "";
-        sharedObjects.selectedUnit = match; // ✅ store exact match
-      });
-      sharedObjects.list.appendChild(div);
-    });
+    const filteredUnits = filterUnits(sharedObjects.units);
+    updateDrowndown(
+      filteredUnits
+        .map((u) => ({
+          unit: u,
+          score: getMatchScore(u.name, query),
+        }))
+        .filter((entry) => entry.score > 0)
+        .sort((a, b) => b.score - a.score)
+        .map((entry) => entry.unit)
+    );
   });
   document.addEventListener("click", (e) => {
     if (!sharedObjects.input.contains(e.target))
