@@ -49,6 +49,7 @@ export function pickTarget(units) {
       infoBox.textContent = `You didn't think I'd just use the naval image for a single joke, did you?`;
       infoBox.style.display = "block";
       document.body.style.backgroundImage = "url('/images/navalbackground.png')";
+      return units[Math.floor(Math.random() * units.length)]
     }
     // Use old system if before cut-off date
     if (isBefore(date, firstDate)) {
