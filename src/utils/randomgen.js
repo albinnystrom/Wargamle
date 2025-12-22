@@ -39,7 +39,7 @@ export function pickTarget(units) {
       infoBox.className = "success-box";
       infoBox.textContent = `Merry Christmas! 🎄`;
       infoBox.style.display = "block";
-      document.body.style.backgroundImage = "url('/images/navalbackground.png')";
+      document.body.style.backgroundImage = "url('/images/navalbackground.webp')";
       return units.find((unit) => unit.name === "Leopard 2");
     }
 
@@ -48,7 +48,7 @@ export function pickTarget(units) {
       infoBox.className = "reveal-box";
       infoBox.textContent = `You didn't think I'd just use the naval image for a single joke, did you?`;
       infoBox.style.display = "block";
-      document.body.style.backgroundImage = "url('/images/navalbackground.png')";
+      document.body.style.backgroundImage = "url('/images/navalbackground.webp')";
       return units[Math.floor(Math.random() * units.length)]
     }
     // Use old system if before cut-off date
