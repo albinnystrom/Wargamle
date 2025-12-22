@@ -32,6 +32,24 @@ export function pickTarget(units) {
     const saved = localStorage.getItem("wgrdle_selected_date");
     date = saved ? new Date(saved) : new Date();
 
+    // Christmas easter egg: on Dec 24 == Leopard 2. It was gonna be halfway into 2027
+    // before Leopard 2 came up naturally - so here's a little gift for Razzman :-)
+    if (date.getMonth() === 11 && date.getDate() == 24) {
+      const infoBox = document.getElementById("infoBox");
+      infoBox.className = "success-box";
+      infoBox.textContent = `Merry Christmas! 🎄`;
+      infoBox.style.display = "block";
+      document.body.style.backgroundImage = "url('/images/navalbackground.png')";
+      return units.find((unit) => unit.name === "Leopard 2");
+    }
+
+    if (date.getMonth() === 11 && date.getDate() == 25) {
+      const infoBox = document.getElementById("infoBox");
+      infoBox.className = "reveal-box";
+      infoBox.textContent = `You didn't think I'd just use the naval image for a single joke, did you?`;
+      infoBox.style.display = "block";
+      document.body.style.backgroundImage = "url('/images/navalbackground.png')";
+    }
     // Use old system if before cut-off date
     if (isBefore(date, firstDate)) {
       const seed = getDateSeed(date);

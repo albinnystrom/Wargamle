@@ -15,7 +15,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const savedState = localStorage.getItem("wgrdle_toggle_state");
   toggle.checked = savedState !== "off";
 
-  fetch("data/units.json")
+  const saved = localStorage.getItem("wgrdle_selected_date");
+  const date = saved ? new Date(saved) : new Date();
+  const jsonUrl = (date.getMonth() == 11 && date.getDate() == 25) ? "data/navalunits.json" : "data/units.json";
+
+  fetch(jsonUrl)
     .then((res) => res.json())
     .then((data) => {
       sharedObjects.units = data.filter((u) => u && u.name);
