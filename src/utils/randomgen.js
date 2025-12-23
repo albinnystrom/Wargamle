@@ -37,7 +37,7 @@ export function pickTarget(units) {
     if (date.getMonth() === 11 && date.getDate() == 24) {
       const infoBox = document.getElementById("infoBox");
       infoBox.className = "success-box";
-      infoBox.textContent = `Merry Christmas! 🎄`;
+      infoBox.textContent = `	༼ つ ◕_◕ ༽つ GIVE NAVAL GAME ༼ つ ◕_◕ ༽つ`;
       infoBox.style.display = "block";
       document.body.style.backgroundImage = "url('images/navalbackground.webp')";
       return units.find((unit) => unit.name === "Leopard 2");
@@ -46,10 +46,9 @@ export function pickTarget(units) {
     if (date.getMonth() === 11 && date.getDate() == 25) {
       const infoBox = document.getElementById("infoBox");
       infoBox.className = "reveal-box";
-      infoBox.textContent = `You didn't think I'd just use the naval image for a single joke, did you?`;
+      infoBox.textContent = `You didn't think I'd use the naval image for a single day, did you?`;
       infoBox.style.display = "block";
       document.body.style.backgroundImage = "url('images/navalbackground.webp')";
-      return units[Math.floor(Math.random() * units.length)]
     }
     // Use old system if before cut-off date
     if (isBefore(date, firstDate)) {

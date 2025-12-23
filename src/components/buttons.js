@@ -146,6 +146,15 @@ export function initializeSearch() {
       const infoBox = document.getElementById("infoBox");
       infoBox.className = "success-box";
       infoBox.textContent = `Correct! The unit is ${sharedObjects.targetUnit.name}`;
+
+      //Christmas logic
+      const saved = localStorage.getItem("wgrdle_selected_date");
+      const date = saved ? new Date(saved) : new Date();
+      console.log(date.getDate())
+      if (date.getMonth() == 11 && date.getDate() == 24) {
+        infoBox.textContent = `Correct! The unit is ${sharedObjects.targetUnit.name}. Merry Christmas :)`;
+      }
+
       infoBox.style.display = "block";
       return;
     }
