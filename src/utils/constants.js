@@ -5,7 +5,17 @@ export const skipKeys = new Set([
   "weapon3_type",
 ]);
 
-export const closenessSets = {
+export function closenessSets() {
+  return isNavalDate() ? navalClosenessSets : standardClosenessSets;
+}
+
+export function isNavalDate() {
+  const saved = localStorage.getItem("wgrdle_selected_date");
+  const date = saved ? new Date(saved) : new Date();
+  return date.getMonth() == 11 && date.getDate() == 25;
+}
+
+export const standardClosenessSets = {
   autonomy: [
     "N/A",
     "60",
@@ -126,6 +136,65 @@ export const closenessSets = {
     "900",
     "1000",
     "1100",
+  ],
+};
+
+export const navalClosenessSets = {
+  autonomy: [
+    "N/A",
+    "60",
+    "75",
+    "90",
+    "150",
+    "165",
+    "180",
+    "195",
+    "550",
+    "600",
+    "685",
+    "750",
+    "850",
+    "900",
+  ],
+  strength: [
+    "6",
+    "10",
+    "40",
+    "50",
+    "60",
+    "80",
+    "100",
+    "120",
+    "150",
+    "175",
+    "180",
+    "200",
+    "250",
+    "300",
+  ],
+  optics: ["Bad", "Poor", "Medium", "Good", "Very good", "Exceptional"],
+  stealth: ["Poor", "Medium"],
+  size: ["Small", "Medium", "Big"],
+  speed: [
+    "60",
+    "65",
+    "175",
+    "210",
+    "250",
+    "270",
+    "300",
+    "350",
+    "375",
+    "400",
+    "450",
+    "500",
+    "550",
+    "600",
+    "650",
+    "700",
+    "750",
+    "900",
+    "1000",
   ],
 };
 

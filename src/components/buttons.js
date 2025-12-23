@@ -26,8 +26,8 @@ function getTooltip(key, guessVal, guessUnit, targetUnit) {
     return `Your categories are a subset of the correct ones`;
   }
 
-  if (key in closenessSets) {
-    const set = closenessSets[key];
+  if (key in closenessSets()) {
+    const set = closenessSets()[key];
     const idx = set.indexOf(normalize(guessVal, key));
     const low = set[idx - 1];
     const high = set[idx + 1];
@@ -150,7 +150,6 @@ export function initializeSearch() {
       //Christmas logic
       const saved = localStorage.getItem("wgrdle_selected_date");
       const date = saved ? new Date(saved) : new Date();
-      console.log(date.getDate())
       if (date.getMonth() == 11 && date.getDate() == 24) {
         infoBox.textContent = `Correct! The unit is ${sharedObjects.targetUnit.name}. Merry Christmas :)`;
       }

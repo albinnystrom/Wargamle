@@ -5,6 +5,7 @@ import {
   differenceInYears,
 } from "https://cdn.jsdelivr.net/npm/date-fns@3.6.0/+esm";
 import { firstTarget, firstDate } from "./constants.js";
+import { sharedObjects } from "../shared/sharedObjects.js";
 
 export function getDateSeed(date) {
   return Number(
@@ -39,16 +40,19 @@ export function pickTarget(units) {
       infoBox.className = "success-box";
       infoBox.textContent = `	༼ つ ◕_◕ ༽つ GIVE NAVAL GAME ༼ つ ◕_◕ ༽つ`;
       infoBox.style.display = "block";
-      document.body.style.backgroundImage = "url('images/navalbackground.webp')";
+      document.body.style.backgroundImage =
+        "url('images/navalbackground.webp')";
       return units.find((unit) => unit.name === "Leopard 2");
     }
 
-    if (date.getMonth() === 11 && date.getDate() == 25) {
+    if (sharedObjects.naval) {
       const infoBox = document.getElementById("infoBox");
       infoBox.className = "reveal-box";
       infoBox.textContent = `You didn't think I'd use the naval image for a single day, did you?`;
       infoBox.style.display = "block";
-      document.body.style.backgroundImage = "url('images/navalbackground.webp')";
+      document.body.style.backgroundImage =
+        "url('images/navalbackground.webp')";
+      return units.find((unit) => unit.name === "PO-HANG");
     }
     // Use old system if before cut-off date
     if (isBefore(date, firstDate)) {
