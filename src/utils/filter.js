@@ -98,11 +98,11 @@ function keyFilter(key, units) {
     return units;
   }
 
-  if (key in closenessSets) {
+  if (key in closenessSets()) {
     if (td.classList.contains("match")) {
       return units.filter((u) => u[key] == td.textContent);
     }
-    const set = closenessSets[key];
+    const set = closenessSets()[key];
     const lwr =
       summaryVals[key][0] != "?" ? set.indexOf(summaryVals[key][0]) : -1;
     const upr =

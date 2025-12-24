@@ -5,6 +5,7 @@ import {
   differenceInYears,
 } from "https://cdn.jsdelivr.net/npm/date-fns@3.6.0/+esm";
 import { firstTarget, firstDate } from "./constants.js";
+import { sharedObjects } from "../shared/sharedObjects.js";
 
 export function getDateSeed(date) {
   return Number(
@@ -37,19 +38,23 @@ export function pickTarget(units) {
     if (date.getMonth() === 11 && date.getDate() == 24) {
       const infoBox = document.getElementById("infoBox");
       infoBox.className = "success-box";
-      infoBox.textContent = `Merry Christmas! 🎄`;
+      infoBox.textContent = `	༼ つ ◕_◕ ༽つ GIVE NAVAL GAME ༼ つ ◕_◕ ༽つ`;
       infoBox.style.display = "block";
-      document.body.style.backgroundImage = "url('/images/navalbackground.png')";
+      document.body.style.backgroundImage =
+        "url('images/navalbackground.webp')";
       return units.find((unit) => unit.name === "Leopard 2");
     }
 
-    if (date.getMonth() === 11 && date.getDate() == 25) {
+    if (sharedObjects.naval) {
       const infoBox = document.getElementById("infoBox");
-      infoBox.className = "reveal-box";
-      infoBox.textContent = `You didn't think I'd just use the naval image for a single joke, did you?`;
+      infoBox.className = "success-box";
+      infoBox.textContent = `Yesterday was a joke.
+Today the boats are real
+(◕‿◕✿)`;
       infoBox.style.display = "block";
-      document.body.style.backgroundImage = "url('/images/navalbackground.png')";
-      return units[Math.floor(Math.random() * units.length)]
+      document.body.style.backgroundImage =
+        "url('images/navalbackground.webp')";
+      return units.find((unit) => unit.name === "PO-HANG");
     }
     // Use old system if before cut-off date
     if (isBefore(date, firstDate)) {

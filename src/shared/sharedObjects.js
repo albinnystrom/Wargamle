@@ -9,4 +9,5 @@ export const sharedObjects = {
   list: document.getElementById("autocompleteList"),
   gotHint: false,
   guesses: 1,
+  naval: false,
 };

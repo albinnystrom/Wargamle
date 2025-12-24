@@ -2,7 +2,7 @@ import { normalize } from "./formatting.js";
 import { closenessSets, ordinalCats } from "./constants.js";
 
 function isAdjacent(value, key) {
-  const set = closenessSets[key];
+  const set = closenessSets()[key];
   if (!set) return [];
   const idx = set.indexOf(value);
   return idx !== -1 ? [set[idx - 1], set[idx + 1]].filter(Boolean) : [];
@@ -33,9 +33,9 @@ export function getClose(key, guessVal) {
   if (key == "year") {
     return [guessVal - 1, guessVal + 1];
   }
-  const idx = closenessSets[key].indexOf(String(guessVal));
+  const idx = closenessSets()[key].indexOf(String(guessVal));
 
-  const set = closenessSets[key];
+  const set = closenessSets()[key];
   return [set[Math.max(0, idx - 1)], set[Math.min(set.length - 1, idx + 1)]];
 }
 
@@ -109,8 +109,8 @@ export function compareVals(key, a, b) {
   if (["price", "year", "speed", "autonomy", "strength"].includes(key)) {
     return Number(a) - Number(b) > 0 ? true : false;
   } else {
-    const x = closenessSets[key].indexOf(a);
-    const y = closenessSets[key].indexOf(b);
+    const x = closenessSets()[key].indexOf(a);
+    const y = closenessSets()[key].indexOf(b);
     return x - y > 0 ? true : false;
   }
 }
