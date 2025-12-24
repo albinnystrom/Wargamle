@@ -47,8 +47,10 @@ export function pickTarget(units) {
 
     if (sharedObjects.naval) {
       const infoBox = document.getElementById("infoBox");
-      infoBox.className = "reveal-box";
-      infoBox.textContent = `You didn't think I'd use the naval image for a single day, did you?`;
+      infoBox.className = "success-box";
+      infoBox.textContent = `Yesterday was a joke.
+Today the boats are real
+(◕‿◕✿)`;
       infoBox.style.display = "block";
       document.body.style.backgroundImage =
         "url('images/navalbackground.webp')";
