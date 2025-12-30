@@ -68,7 +68,7 @@
             85, 90, 95, 100, 105, 110, 115, 120, 125, 130, 135, 140, 145, 150,
             155, 160, 165, 170, 175, 180, 190, 200, 250, 420, 500
         ],
-        "ops": ["interval, gtlt, single"],
+        "ops": ["interval", "gtlt", "single"],
         "scale": "ratio"
     },
     {
@@ -81,7 +81,7 @@
             270, 275, 280, 285, 290, 300, 310, 315, 320, 330, 350, 375, 400,
             450, 500, 550, 600, 650, 700, 750, 900, 1000, 1100
         ],
-        "ops": ["interval, gtlt"],
+        "ops": ["interval", "gtlt"],
         "scale": "ratio"
     },
     {
@@ -92,7 +92,7 @@
             2, 3, 4, 5, 6, 8, 10, 15, 40, 50, 60, 80, 100, 120, 150, 175, 180,
             200, 250, 300
         ],
-        "ops": ["interval, gtlt"],
+        "ops": ["interval", "gtlt"],
         "scale": "ratio"
     },
     {
@@ -106,7 +106,7 @@
             560, 570, 575, 600, 630, 640, 650, 660, 680, 685, 700, 710, 720,
             750, 785, 790, 800, 850, 900, 930, 950, 1000, 1100, 1200, 1600, 2000
         ],
-        "ops": ["single, interval, gtlt"],
+        "ops": ["single", "interval", "gtlt"],
         "scale": "ratio"
     },
     {
@@ -114,7 +114,7 @@
         "type": "tabval",
         "stat": "size",
         "vals": ["Very small", "Small", "Medium", "Big", "Very big"],
-        "ops": ["single, gtlt"],
+        "ops": ["single", "gtlt"],
         "scale": "ordinal"
     },
     {
@@ -130,7 +130,7 @@
             "Very good",
             "Exceptional"
         ],
-        "ops": ["single, gtlt"],
+        "ops": ["single", "gtlt"],
         "scale": "ordinal"
     },
     {
@@ -138,7 +138,7 @@
         "type": "tabval",
         "stat": "stealth",
         "vals": ["Poor", "Medium", "Good", "Very good", "Exceptional"],
-        "ops": ["single, gtlt"],
+        "ops": ["single", "gtlt"],
         "scale": "ordinal"
     },
     {
@@ -1345,7 +1345,7 @@
             "Armored",
             "Support"
         ],
-        "ops": ["union, single"],
+        "ops": ["union", "single"],
         "scale": "nominal"
     }
 ]
