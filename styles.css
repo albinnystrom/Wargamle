@@ -334,3 +334,17 @@ img.flagIcon {
   border: 1px solid #ccc;
   border-radius: 2px;
 }
+
+.squaregame {
+  display: grid;
+  grid-template-columns: auto auto auto auto;
+  background-color: rgba(245, 222, 179, 0.71);
+  padding: 10px;
+}
+.squaregame div {
+  background-color: #f1f1f1;
+  border: 1px solid #ccc;
+  padding: 10px;
+  font-size: 30px;
+  text-align: center;
+}

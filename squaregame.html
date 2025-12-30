@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>WARGAMle</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="icon" href="images/logo.png" type="image/png" />
+  </head>
+
+  <body>
+    <div class="container">
+      <img class="logo" src="images/logo.png" alt="Wargamele" />
+      <div class="options">
+        <div class="daily-toggle">
+          <label class="toggle-label">Daily</label>
+          <label class="switch">
+            <input type="checkbox" id="dailyToggle" checked />
+            <span class="slider"></span>
+          </label>
+          <input type="date" id="datePicker" />
+        </div>
+
+        <div class="search-bar">
+          <div style="position: relative">
+            <input
+              type="text"
+              id="unitInput"
+              placeholder="Enter unit name..."
+              autocomplete="off"
+            />
+            <div id="autocompleteList"></div>
+          </div>
+          <button id="searchBtn">Match</button>
+          <button id="newUnitBtn">New Unit</button>
+          <button id="giveUpBtn">Give up</button>
+          <button id="shareBtn">Share</button>
+        </div>
+      </div>
+
+      <div id="infoBox" class="info-box"></div>
+      <div class="squaregame">
+        <div>-</div>
+        <div>2</div>
+        <div>3</div>
+        <div>4</div>
+        <div>5</div>
+        <div>?</div>
+        <div>?</div>
+        <div>?</div>
+        <div>6</div>
+        <div>?</div>
+        <div>?</div>
+        <div>?</div>
+        <div>7</div>
+        <div>?</div>
+        <div>?</div>
+        <div>?</div>
+      </div>
+    </div>
+
+    <script type="module" src="src/wargamle.js"></script>
+  </body>
+</html>
