@@ -7,6 +7,10 @@ import {
 import { firstTarget, firstDate } from "./constants.js";
 import { sharedObjects } from "../shared/wargamleSharedObjects.js";
 
+export function randInt(seed, max) {
+    return Math.floor(mulberry32(seed)() * max);
+}
+
 export function getDateSeed(date) {
     return Number(
         `${date.getFullYear()}${String(date.getMonth() + 1).padStart(
