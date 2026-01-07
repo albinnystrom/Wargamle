@@ -33,7 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
             initializeTable();
             initializeDatePicker();
             initializeGiveUpBtn();
-            initializeSearchBox();
+            initializeSearchBox(sharedObjects.input);
             initializeSearch();
             initializeShareBtn();
         });

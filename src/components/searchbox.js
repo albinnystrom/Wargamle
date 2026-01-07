@@ -26,8 +26,8 @@ function getMatchScore(unitName, query) {
     return 0;
 }
 
-function updateDrowndown(units) {
-    sharedObjects.list.innerHTML = "";
+function updateDrowndown(units, input, autoCompL) {
+    autoCompL.innerHTML = "";
     sharedObjects.highlightedIndex = -1;
     currentSuggestions = units;
     currentSuggestions.forEach((match, index) => {
@@ -47,17 +47,19 @@ function updateDrowndown(units) {
         div.dataset.index = index;
         div.classList.add("autocomplete-item");
         div.addEventListener("mousedown", () => {
-            sharedObjects.input.value = match.name;
-            sharedObjects.list.innerHTML = "";
+            input.value = match.name;
+            autoCompL.innerHTML = "";
             sharedObjects.selectedUnit = match; // ✅ store exact match
         });
-        sharedObjects.list.appendChild(div);
+        autoCompL.appendChild(div);
     });
 }
 
-export function initializeSearchBox() {
-    sharedObjects.input.addEventListener("keydown", (e) => {
-        const items = sharedObjects.list.querySelectorAll(".autocomplete-item");
+export function initializeSearchBox(input) {
+    const autoCompL =
+        input.parentElement.querySelectorAll("#autocompleteList")[0];
+    input.addEventListener("keydown", (e) => {
+        const items = autoCompL.querySelectorAll(".autocomplete-item");
 
         if (e.key === "ArrowDown") {
             e.preventDefault();
@@ -92,22 +94,22 @@ export function initializeSearchBox() {
             ) {
                 const match =
                     currentSuggestions[sharedObjects.highlightedIndex];
-                sharedObjects.input.value = match.name;
+                input.value = match.name;
                 sharedObjects.selectedUnit = match; // ✅ ensure correct unit is stored
-                sharedObjects.list.innerHTML = "";
+                autoCompL.innerHTML = "";
                 sharedObjects.highlightedIndex = -1;
             }
             document.getElementById("searchBtn").click();
         }
     });
 
-    sharedObjects.input.addEventListener("click", () => {
-        updateDrowndown(filterUnits(sharedObjects.units));
+    input.addEventListener("click", () => {
+        updateDrowndown(filterUnits(sharedObjects.units), input, autoCompL);
     });
 
-    sharedObjects.input.addEventListener("input", () => {
-        const query = sharedObjects.input.value.toLowerCase().trim();
-        sharedObjects.list.innerHTML = "";
+    input.addEventListener("input", () => {
+        const query = input.value.toLowerCase().trim();
+        autoCompL.innerHTML = "";
         sharedObjects.highlightedIndex = -1;
 
         const filteredUnits = filterUnits(sharedObjects.units);
@@ -119,11 +121,12 @@ export function initializeSearchBox() {
                 }))
                 .filter((entry) => entry.score > 0)
                 .sort((a, b) => b.score - a.score)
-                .map((entry) => entry.unit)
+                .map((entry) => entry.unit),
+            input,
+            autoCompL
         );
     });
     document.addEventListener("click", (e) => {
-        if (!sharedObjects.input.contains(e.target))
-            sharedObjects.list.innerHTML = "";
+        if (!input.contains(e.target)) autoCompL.innerHTML = "";
     });
 }
