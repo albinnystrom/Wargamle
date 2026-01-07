@@ -52,10 +52,16 @@ function updateDrowndown(units, input, autoCompL) {
             newdiv.textContent = match.name;
             newdiv.style.textAlign = "center";
             const idx = Number(input.dataset.idx);
-            sharedObjects.correctUnits[idx].includes(match.name)
-                ? newdiv.classList.add("match")
-                : newdiv.classList.add("fail");
-
+            if (
+                sharedObjects.correctUnits[idx].find(
+                    (u) => u.name === match.name && u.country === match.country
+                )
+            ) {
+                newdiv.classList.add("match");
+                sharedObjects.guessedUnits.push(match.name, match.country);
+            } else {
+                newdiv.classList.add("fail");
+            }
             input.replaceWith(newdiv);
             input.value = match.name;
             autoCompL.innerHTML = "";
@@ -87,7 +93,7 @@ export function endGame() {
         sharedObjects.correctUnits[key].forEach((match) => {
             const div = document.createElement("li");
             const country = sharedObjects.units.find(
-                (u) => u.name === match
+                (u) => u.name === match.name && u.country === match.country
             ).country;
             const flagImg = document.createElement("img");
             const countryFile = country.toLowerCase().replace(/\s+/g, "_");
@@ -95,12 +101,12 @@ export function endGame() {
             flagImg.classList.add("flagIcon");
 
             const nameSpan = document.createElement("span");
-            nameSpan.textContent = match;
+            nameSpan.textContent = match.name;
 
             div.appendChild(flagImg);
             div.appendChild(nameSpan);
 
-            if (match === higihLightname) {
+            if (match.name === higihLightname) {
                 div.classList.add("match");
             }
             div.classList.add("autocomplete-item");
@@ -154,10 +160,17 @@ export function initializeSearchBox(input) {
                 newdiv.textContent = match.name;
                 newdiv.style.textAlign = "center";
                 const idx = Number(input.dataset.idx);
-                sharedObjects.correctUnits[idx].includes(match.name)
-                    ? newdiv.classList.add("match")
-                    : newdiv.classList.add("fail");
-
+                if (
+                    sharedObjects.correctUnits[idx].find(
+                        (u) =>
+                            u.name === match.name && u.country === match.country
+                    )
+                ) {
+                    newdiv.classList.add("match");
+                    sharedObjects.guessedUnits.push(match.name, match.country);
+                } else {
+                    newdiv.classList.add("fail");
+                }
                 input.replaceWith(newdiv);
                 input.value = match.name;
                 sharedObjects.selectedUnit = match; // ✅ ensure correct unit is stored
