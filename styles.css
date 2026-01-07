@@ -65,16 +65,25 @@ button:hover {
 
 #autocompleteList {
   position: absolute;
+  top: 100%;      
+  left: 0;
+  width: 100%;
   max-height: 250px;
-  overflow: auto;
+  overflow-y: auto;
   background: white;
   border: 1px solid #ccc;
-  width: 300px;
-  top: 100%;
-  left: 0;
   border-radius: 0.5rem;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  z-index: 10;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  z-index: 1000; 
+}
+
+
+#autocompleteList.hidden {
+  max-height: 0;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  overflow: hidden;
 }
 
 #autocompleteList div {
@@ -137,6 +146,14 @@ tr {
 
 .match {
   background-color: #bedf88;
+}
+
+.neutral{
+  background-color: #edeae2
+}
+
+.category{
+  background-color: #efd8bb
 }
 
 .tooltip {
@@ -338,13 +355,52 @@ img.flagIcon {
 .squaregame {
   display: grid;
   grid-template-columns: auto auto auto auto;
-  background-color: rgba(245, 222, 179, 0.71);
+  background-color: #efd8bb;
   padding: 10px;
+  border-radius: 15px;
 }
 .squaregame div {
-  background-color: #f1f1f1;
-  border: 1px solid #ccc;
+  border: 1px solid #e0e0e0;
   padding: 10px;
-  font-size: 30px;
+  font-size: 15px;
   text-align: center;
+  border-radius: 3px;
+  max-height: 120px;
+  overflow-y: scroll;
+}
+
+.squaregame div.pressed{
+  background-color: #d2d2d2;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: none; /* hidden by default */
+  align-items: center;
+  justify-content: center;
+}
+
+.overlay.active {
+  display: flex; /* shows when active */
+}
+
+.popup {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  min-width: 300px;
+}
+
+.squareList{
+  list-style: none;
+  margin: 0;
+  padding: 0.5rem;
+
+  overflow: auto;   
+  min-height: 0;    
+  min-width: 0;
+
+  border: 1px solid #ccc;
 }
