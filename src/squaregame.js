@@ -15,8 +15,8 @@ import { populateGrid } from "./components/grid.js";
 
 document.addEventListener("DOMContentLoaded", () => {
     const popup = document.getElementById("popup");
-    if (localStorage.getItem("popupclosed")) {
-        popup.classList.remove("active");
+    if (!localStorage.getItem("popupclosed")) {
+        popup.classList.add("active");
     }
     const closePopup = document.getElementById("closePopup");
 
