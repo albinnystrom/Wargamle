@@ -8,6 +8,7 @@ import { closenessSets } from "../utils/constants.js";
 import { sharedObjects } from "../shared/wargamleSharedObjects.js";
 import { updateSummaryVals } from "./resultTable.js";
 import { notVals } from "../utils/filter.js";
+import { endGame } from "./searchbox2.js";
 
 function getTooltip(key, guessVal, guessUnit, targetUnit) {
     if (key == "price") {
@@ -214,6 +215,12 @@ export function initializeGiveUpBtn() {
                 td.classList.add("fail");
             }
         });
+    });
+}
+
+export function squaregameInitializeGiveUpBtn() {
+    document.getElementById("giveUpBtn").addEventListener("click", () => {
+        endGame();
     });
 }
 
