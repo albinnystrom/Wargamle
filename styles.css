@@ -365,8 +365,6 @@ img.flagIcon {
   font-size: 15px;
   text-align: center;
   border-radius: 3px;
-  max-height: 120px;
-  overflow-y: scroll;
 }
 
 .squaregame div.pressed{
@@ -403,4 +401,6 @@ img.flagIcon {
   min-width: 0;
 
   border: 1px solid #ccc;
+  max-height: 120px;
+  overflow-y: scroll;
 }
