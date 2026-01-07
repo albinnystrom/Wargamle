@@ -103,9 +103,9 @@ class Category {
 
 /* -------------------- Constraints -------------------- */
 
-const MIN_UNITS = 5;
+const MIN_UNITS = 1;
 const COL_MIN = 3;
-const COL_MAX = 12;
+const COL_MAX = 8;
 
 /* -------------------- Generator -------------------- */
 
@@ -115,7 +115,7 @@ export function getCats(cats) {
     const baseSeed = getDateSeed(date);
     const rng = createRNG(baseSeed, dailyMode);
 
-    const MAX_RESTARTS = 50;
+    const MAX_RESTARTS = 500;
     const MAX_TRIES_PER_SLOT = 500;
 
     for (let restart = 0; restart < MAX_RESTARTS; restart++) {
