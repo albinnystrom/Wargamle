@@ -1,6 +1,9 @@
 import { getDateSeed, randInt } from "./randomgen.js";
 import { sharedObjects } from "../shared/squareSharedObjects.js";
 import { parseGuess } from "./formatting.js";
+import { compareVals } from "./closeness.js";
+import { closenessSets } from "./constants.js";
+compareVals;
 
 /* -------------------- Date / Mode -------------------- */
 
@@ -22,6 +25,14 @@ function createRNG(baseSeed, dailyMode) {
     };
 }
 
+function jaccard(aSet, bSet) {
+    let intersection = 0;
+    for (const v of aSet) {
+        if (bSet.has(v)) intersection++;
+    }
+    return intersection / (aSet.size + bSet.size - intersection);
+}
+
 /* -------------------- Category -------------------- */
 
 class Category {
@@ -29,6 +40,7 @@ class Category {
         this.name = json.name;
         this.type = json.type;
         this.stat = json.stat;
+        this.scale = json.scale;
 
         const vals = json.vals;
         const op = json.ops[rng(json.ops.length)];
@@ -41,10 +53,23 @@ class Category {
             this.lower = vals[i];
             this.upper = vals[j];
 
-            this.inCat = (u) => {
-                const v = parseGuess(u[this.stat]);
-                return this.lower <= v && v <= this.upper;
-            };
+            if (this.scale === "ratio") {
+                this.inCat = (u) => {
+                    const v = parseGuess(u[this.stat]);
+                    return this.lower <= v && v <= this.upper;
+                };
+            } else if (this.scale === "ordinal") {
+                this.inCat = (u) => {
+                    const v = closenessSets()[this.stat].indexOf(u[this.stat]);
+                    const lwr = closenessSets()[this.stat].indexOf(this.lower);
+                    const upr = closenessSets()[this.stat].indexOf(this.upper);
+                    return lwr <= v && v <= upr;
+                };
+            } else {
+                throw new Error(
+                    `Category op: ${this.op} doesn't support scale ${this.scale})`
+                );
+            }
 
             this.toString = () =>
                 `${this.lower} <= ${this.stat} <= ${this.upper}`;
@@ -67,12 +92,44 @@ class Category {
             if (rng(2)) {
                 this.op = "lt";
                 this.compval = vals[rng(vals.length - 1) + 1];
-                this.inCat = (u) => parseGuess(u[this.stat]) < this.compval;
+                if (this.scale === "ratio") {
+                    this.inCat = (u) => parseGuess(u[this.stat]) < this.compval;
+                } else if (this.scale === "ordinal") {
+                    this.inCat = (u) => {
+                        const stt = closenessSets()[this.stat].indexOf(
+                            u[this.stat]
+                        );
+                        const cmp = closenessSets()[this.stat].indexOf(
+                            this.compval
+                        );
+                        return stt < cmp;
+                    };
+                } else {
+                    throw new Error(
+                        `Category op: ${this.op} doesn't support scale ${this.scale})`
+                    );
+                }
                 this.toString = () => `${this.stat} < ${this.compval}`;
             } else {
                 this.op = "gt";
                 this.compval = vals[rng(vals.length - 1)];
-                this.inCat = (u) => parseGuess(u[this.stat]) > this.compval;
+                if (this.scale === "ratio") {
+                    this.inCat = (u) => parseGuess(u[this.stat]) > this.compval;
+                } else if (this.scale === "ordinal") {
+                    this.inCat = (u) => {
+                        const stt = closenessSets()[this.stat].indexOf(
+                            u[this.stat]
+                        );
+                        const cmp = closenessSets()[this.stat].indexOf(
+                            this.compval
+                        );
+                        return stt > cmp;
+                    };
+                } else {
+                    throw new Error(
+                        `Category op: ${this.op} doesn't support scale ${this.scale})`
+                    );
+                }
                 this.toString = () => `${this.stat} > ${this.compval}`;
             }
         } else if (op === "single") {
@@ -105,7 +162,9 @@ class Category {
 
 const MIN_UNITS = 1;
 const COL_MIN = 3;
-const COL_MAX = 8;
+const COL_MAX = 10;
+const MAX_ROW_SIMILARITY = 0.8;
+const MAX_COL_SIMILARITY = 0.8;
 
 /* -------------------- Generator -------------------- */
 
@@ -132,8 +191,26 @@ export function getCats(cats) {
                 const cat = new Category(json, rng);
                 if (cat.units.length < MIN_UNITS) continue;
 
+                //COLUMNS
+                if (slot < 3) {
+                    let ok = true;
+
+                    for (const prev of picks) {
+                        const sim = jaccard(cat.unitSet, prev.unitSet);
+                        if (sim > MAX_COL_SIMILARITY) {
+                            ok = false;
+                            break;
+                        }
+                    }
+
+                    if (!ok) continue;
+                }
+
+                //ROWS
                 if (slot >= 3) {
                     let ok = true;
+
+                    //possible units constraints
                     for (let i = 0; i < 3; i++) {
                         const ov = cat.overlap(picks[i]);
                         if (ov < COL_MIN || ov > COL_MAX) {
@@ -142,6 +219,31 @@ export function getCats(cats) {
                         }
                     }
                     if (!ok) continue;
+
+                    //row diversity
+                    const rowSets = picks.slice(0, 3).map((col) => {
+                        const s = new Set();
+                        for (const u of cat.units) {
+                            if (col.unitSet.has(u)) s.add(u);
+                        }
+                        return s;
+                    });
+
+                    let diverse = true;
+                    for (let i = 0; i < 3; i++) {
+                        for (let j = i + 1; j < 3; j++) {
+                            if (
+                                jaccard(rowSets[i], rowSets[j]) >
+                                MAX_ROW_SIMILARITY
+                            ) {
+                                diverse = false;
+                                break;
+                            }
+                        }
+                        if (!diverse) break;
+                    }
+
+                    if (!diverse) continue;
                 }
 
                 picks.push(cat);
@@ -176,13 +278,11 @@ export function getCats(cats) {
             for (let i = 0; i < 9; i++) {
                 const row = Math.floor(i / 3);
                 const col = i % 3;
-                sharedObjects.correctUnits[i] = sharedObjects.units
-                    .filter(
-                        (u) =>
-                            picks[row + 3].units.includes(u) &&
-                            picks[col].units.includes(u)
-                    )
-                    .map((u) => u.name);
+                sharedObjects.correctUnits[i] = sharedObjects.units.filter(
+                    (u) =>
+                        picks[row + 3].units.includes(u) &&
+                        picks[col].units.includes(u)
+                );
             }
             debugOutput(picks);
             return picks;
