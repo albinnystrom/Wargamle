@@ -15,9 +15,15 @@ import { populateGrid } from "./components/grid.js";
 
 document.addEventListener("DOMContentLoaded", () => {
     const popup = document.getElementById("popup");
+    if (localStorage.getItem("popupclosed")) {
+        popup.classList.remove("active");
+    }
     const closePopup = document.getElementById("closePopup");
 
-    closePopup.onclick = () => popup.classList.remove("active");
+    closePopup.onclick = () => {
+        popup.classList.remove("active");
+        localStorage.setItem("popupclosed", true);
+    };
 
     const toggle = document.getElementById("dailyToggle");
     const savedState = localStorage.getItem("wgrdle_toggle_state");
