@@ -2,24 +2,22 @@ import { getDateSeed, randInt } from "./randomgen.js";
 import { sharedObjects } from "../shared/squareSharedObjects.js";
 import { parseGuess } from "./formatting.js";
 
+/* -------------------- Date / Mode -------------------- */
+
 const saved = localStorage.getItem("wgrdle_selected_date");
 const date = saved ? new Date(saved) : new Date();
 
-let dailyMode = false;
+/* -------------------- RNG -------------------- */
 
-/* -------------------- RNG helper -------------------- */
-
-function createRNG(baseSeed) {
+function createRNG(baseSeed, dailyMode) {
     let seed = baseSeed;
 
     return (max) => {
-        let val;
-        if (dailyMode) {
-            val = randInt(seed, max);
-            seed += 1e5;
-        } else {
-            val = Math.floor(Math.random() * max);
+        if (!dailyMode) {
+            return Math.floor(Math.random() * max);
         }
+        const val = randInt(seed, max);
+        seed += 1e5;
         return val;
     };
 }
@@ -27,140 +25,186 @@ function createRNG(baseSeed) {
 /* -------------------- Category -------------------- */
 
 class Category {
-    constructor(json, baseSeed) {
-        const nextIdx = createRNG(baseSeed);
-
+    constructor(json, rng) {
         this.name = json.name;
         this.type = json.type;
         this.stat = json.stat;
+
         const vals = json.vals;
+        const op = json.ops[rng(json.ops.length)];
+        this.op = op;
 
-        this.op = json.ops[nextIdx(json.ops.length)];
+        if (op === "interval") {
+            const i = rng(vals.length - 1);
+            const j = rng(vals.length - i - 1) + i + 1;
 
-        /* ---------- interval ---------- */
-        if (this.op === "interval") {
-            this.lower = vals[nextIdx(vals.length - 1)];
-            this.upper = vals[nextIdx(vals.length)];
-
-            let guard = 0;
-            while (this.upper < this.lower && guard++ < 50) {
-                this.upper = vals[nextIdx(vals.length)];
-            }
+            this.lower = vals[i];
+            this.upper = vals[j];
 
             this.inCat = (u) => {
-                const guessVal = parseGuess(u[this.stat]);
-                return this.lower <= guessVal && guessVal <= this.upper;
+                const v = parseGuess(u[this.stat]);
+                return this.lower <= v && v <= this.upper;
             };
 
             this.toString = () =>
                 `${this.lower} <= ${this.stat} <= ${this.upper}`;
-        } else if (this.op === "union") {
-            /* ---------- union ---------- */
-            this.first = vals[nextIdx(vals.length)];
-            this.second = vals[nextIdx(vals.length)];
+        } else if (op === "union") {
+            const i = rng(vals.length);
+            let j = rng(vals.length - 1);
+            if (j >= i) j++;
 
-            let guard = 0;
-            while (this.first === this.second && guard++ < 50) {
-                this.second = vals[nextIdx(vals.length)];
-            }
+            this.first = vals[i];
+            this.second = vals[j];
 
             this.inCat = (u) => {
-                const guessVal = parseGuess(u[this.stat]);
-                return guessVal === this.first || guessVal === this.second;
+                const v = parseGuess(u[this.stat]);
+                return v === this.first || v === this.second;
             };
 
             this.toString = () =>
                 `${this.stat}: ${this.first} or ${this.second}`;
-        } else if (this.op === "gtlt") {
-            /* ---------- greater / less ---------- */
-            if (nextIdx(2)) {
+        } else if (op === "gtlt") {
+            if (rng(2)) {
                 this.op = "lt";
-                this.compval = vals[nextIdx(vals.length - 1) + 1];
+                this.compval = vals[rng(vals.length - 1) + 1];
                 this.inCat = (u) => parseGuess(u[this.stat]) < this.compval;
                 this.toString = () => `${this.stat} < ${this.compval}`;
             } else {
                 this.op = "gt";
-                this.compval = vals[nextIdx(vals.length - 1)];
+                this.compval = vals[rng(vals.length - 1)];
                 this.inCat = (u) => parseGuess(u[this.stat]) > this.compval;
                 this.toString = () => `${this.stat} > ${this.compval}`;
             }
-        } else if (this.op === "single") {
-            /* ---------- single ---------- */
-            this.val = vals[nextIdx(vals.length)];
+        } else if (op === "single") {
+            this.val = vals[rng(vals.length)];
             this.inCat = (u) => parseGuess(u[this.stat]) === this.val;
-            this.toString = () => `${this.stat} == ${this.val}`;
+            this.toString = () => `${this.stat} = ${this.val}`;
         }
+
+        /* ---- Precompute units ---- */
+        this.units = [];
+        for (const u of sharedObjects.units) {
+            if (this.inCat(u)) this.units.push(u);
+        }
+        this.unitSet = new Set(this.units);
     }
 
-    isIn(unit) {
-        return this.inCat(unit);
+    overlap(other) {
+        let count = 0;
+        const small = this.units.length < other.units.length ? this : other;
+        const bigSet = small === this ? other.unitSet : this.unitSet;
+
+        for (const u of small.units) {
+            if (bigSet.has(u)) count++;
+        }
+        return count;
     }
 }
+
+/* -------------------- Constraints -------------------- */
+
+const MIN_UNITS = 5;
+const COL_MIN = 3;
+const COL_MAX = 12;
 
 /* -------------------- Generator -------------------- */
 
 export function getCats(cats) {
-    return genCats(cats);
-}
+    const dailyMode = document.getElementById("dailyToggle").checked;
 
-function genCats(cats) {
-    dailyMode = document.getElementById("dailyToggle").checked;
+    const baseSeed = getDateSeed(date);
+    const rng = createRNG(baseSeed, dailyMode);
 
-    const catPicks = [];
-    let offset = 1e5;
-    let attempts = 0;
+    const MAX_RESTARTS = 50;
+    const MAX_TRIES_PER_SLOT = 500;
 
-    while (catPicks.length < 6) {
-        attempts++;
+    for (let restart = 0; restart < MAX_RESTARTS; restart++) {
+        const picks = [];
+        const usedNames = new Set();
 
-        if (attempts > 1000) {
-            catPicks.length = 0;
-            attempts = 0;
+        for (let slot = 0; slot < 6; slot++) {
+            let placed = false;
+
+            for (let tries = 0; tries < MAX_TRIES_PER_SLOT; tries++) {
+                const json = cats[rng(cats.length)];
+                if (usedNames.has(json.name)) continue;
+
+                const cat = new Category(json, rng);
+                if (cat.units.length < MIN_UNITS) continue;
+
+                if (slot >= 3) {
+                    let ok = true;
+                    for (let i = 0; i < 3; i++) {
+                        const ov = cat.overlap(picks[i]);
+                        if (ov < COL_MIN || ov > COL_MAX) {
+                            ok = false;
+                            break;
+                        }
+                    }
+                    if (!ok) continue;
+                }
+
+                picks.push(cat);
+                usedNames.add(cat.name);
+                placed = true;
+                break;
+            }
+
+            if (!placed) break;
         }
 
-        const baseSeed = getDateSeed(date) + offset;
-        const cat = new Category(
-            cats[randInt(baseSeed, cats.length)],
-            baseSeed
-        );
+        if (picks.length === 6) {
+            // Check for unnecessary ORs
+            for (const p of picks) {
+                if (p.op != "union") continue;
 
-        offset += 1e5;
+                const fst = sharedObjects.units.filter(
+                    (u) => u[p.stat] === p.first
+                );
+                const snd = sharedObjects.units.filter(
+                    (u) => u[p.stat] === p.second
+                );
 
-        /* unique name */
-        if (catPicks.some((c) => c.name === cat.name)) continue;
+                if (fst.length === 0) {
+                    p.toString = () => `${p.stat} = ${p.second}`;
+                } else if (snd.length === 0) {
+                    p.toString = () => `${p.stat} = ${p.first}`;
+                }
+            }
 
-        /* at least 5 units */
-        const catUnits = sharedObjects.units.filter((u) => cat.isIn(u));
-        if (catUnits.length < 5) continue;
-
-        /* column overlap rules */
-        if (catPicks.length >= 3) {
-            const cols = catPicks.slice(0, 3);
-            const ok = cols.every((c) => {
-                const overlap = sharedObjects.units.filter(
-                    (u) => c.isIn(u) && catUnits.includes(u)
-                ).length;
-                return overlap >= 5 && overlap <= 30;
-            });
-            if (!ok) continue;
+            // Populate correctUnits
+            for (let i = 0; i < 9; i++) {
+                const row = Math.floor(i / 3);
+                const col = i % 3;
+                sharedObjects.correctUnits[i] = sharedObjects.units
+                    .filter(
+                        (u) =>
+                            picks[row + 3].units.includes(u) &&
+                            picks[col].units.includes(u)
+                    )
+                    .map((u) => u.name);
+            }
+            debugOutput(picks);
+            return picks;
         }
-
-        catPicks.push(cat);
     }
 
-    /* debug output */
+    throw new Error("Unable to generate valid categories");
+}
+
+/* -------------------- Debug -------------------- */
+
+function debugOutput(catPicks) {
     for (let i = 0; i < 3; i++) {
         for (let j = 3; j < 6; j++) {
             console.log(
                 `${catPicks[i].toString()} AND ${catPicks[j].toString()}`
             );
             console.log(
-                sharedObjects.units
-                    .filter((u) => catPicks[i].isIn(u) && catPicks[j].isIn(u))
+                catPicks[i].units
+                    .filter((u) => catPicks[j].unitSet.has(u))
                     .map((u) => u.name)
             );
         }
     }
-
-    return catPicks;
 }
