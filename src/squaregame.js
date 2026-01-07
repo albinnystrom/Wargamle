@@ -1,6 +1,6 @@
 import { sharedObjects } from "./shared/squareSharedObjects.js";
 import {
-    initializeGiveUpBtn,
+    squaregameInitializeGiveUpBtn,
     initializeSearch,
     initializeShareBtn,
 } from "./components/buttons.js";
@@ -11,8 +11,14 @@ import { initializeDatePicker } from "./components/datePicker.js";
 import { initializeTable } from "./components/resultTable.js";
 import { isNavalDate } from "./utils/constants.js";
 import { getCats } from "./utils/cats.js";
+import { populateGrid } from "./components/grid.js";
 
 document.addEventListener("DOMContentLoaded", () => {
+    const popup = document.getElementById("popup");
+    const closePopup = document.getElementById("closePopup");
+
+    closePopup.onclick = () => popup.classList.remove("active");
+
     const toggle = document.getElementById("dailyToggle");
     const savedState = localStorage.getItem("wgrdle_toggle_state");
     toggle.checked = savedState !== "off";
@@ -26,9 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
             sharedObjects.units = data.filter((u) => u && u.name);
 
             initializeDatePicker();
-            initializeGiveUpBtn();
-            initializeSearchBox();
-            initializeSearch();
+            squaregameInitializeGiveUpBtn();
             initializeShareBtn();
         })
         .then(() => {
@@ -36,7 +40,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 .then((res) => res.json())
                 .then((data) => {
                     sharedObjects.cats = getCats(data);
-                    console.log(sharedObjects.cats);
+                })
+                .then(() => {
+                    populateGrid();
                 });
         });
 });
