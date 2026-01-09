@@ -162,7 +162,7 @@ class Category {
 
 const MIN_UNITS = 1;
 const COL_MIN = 3;
-const COL_MAX = 10;
+const COL_MAX = 15;
 const MAX_ROW_SIMILARITY = 0.8;
 const MAX_COL_SIMILARITY = 0.8;
 
