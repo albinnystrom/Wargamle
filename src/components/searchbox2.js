@@ -61,6 +61,7 @@ function updateDrowndown(units, input, autoCompL) {
                 sharedObjects.guessedUnits.push(match.name, match.country);
             } else {
                 newdiv.classList.add("fail");
+                sharedObjects.wrongGuesses[index].push(match);
             }
             input.replaceWith(newdiv);
             input.value = match.name;
@@ -90,6 +91,9 @@ export function endGame() {
         lst.classList.add("squareList");
         lst.classList.add("neutral");
 
+        sharedObjects.wrongGuesses[key].forEach((g) =>
+            sharedObjects.correctUnits[key].push(g)
+        );
         sharedObjects.correctUnits[key].forEach((match) => {
             const div = document.createElement("li");
             const country = sharedObjects.units.find(
@@ -102,12 +106,40 @@ export function endGame() {
 
             const nameSpan = document.createElement("span");
             nameSpan.textContent = match.name;
+            nameSpan.style.whiteSpace = "pre-line";
 
             div.appendChild(flagImg);
             div.appendChild(nameSpan);
 
             if (match.name === higihLightname) {
                 div.classList.add("match");
+            } else if (sharedObjects.wrongGuesses[key].includes(match)) {
+                div.classList.add("fail");
+
+                const row = Math.floor(key / 3);
+                const col = key % 3;
+
+                const rowcat = sharedObjects.cats[row + 3];
+                const colcat = sharedObjects.cats[col];
+
+                const inrow = rowcat.units.find(
+                    (u) => u.name === match.name && u.country === match.country
+                );
+                const incol = colcat.units.find(
+                    (u) => u.name === match.name && u.country === match.country
+                );
+
+                if (!inrow && !incol) {
+                    nameSpan.textContent = `\n${match.name}\n 
+                    ${colcat.stat} = \n${match[colcat.stat]}\n
+                    ${rowcat.stat} = \n${match[rowcat.stat]}\n`;
+                } else if (!incol) {
+                    nameSpan.textContent = `\n${match.name}\n, 
+                    ${colcat.stat} = \n${match[colcat.stat]},`;
+                } else if (!inrow) {
+                    nameSpan.textContent = `\n${match.name}\n, 
+                    ${rowcat.stat} = \n${match[rowcat.stat]},`;
+                }
             }
             div.classList.add("autocomplete-item");
             lst.appendChild(div);
@@ -170,6 +202,7 @@ export function initializeSearchBox(input) {
                     sharedObjects.guessedUnits.push(match.name, match.country);
                 } else {
                     newdiv.classList.add("fail");
+                    sharedObjects.wrongGuesses[index].push(match);
                 }
                 input.replaceWith(newdiv);
                 input.value = match.name;

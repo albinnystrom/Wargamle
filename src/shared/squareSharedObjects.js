@@ -7,4 +7,5 @@ export const sharedObjects = {
     guessCounter: null,
     guesses: 0,
     guessedUnits: [],
+    wrongGuesses: [[], [], [], [], [], [], [], [], []],
 };
