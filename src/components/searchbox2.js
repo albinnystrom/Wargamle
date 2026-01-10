@@ -52,6 +52,7 @@ function updateDrowndown(units, input, autoCompL) {
             newdiv.textContent = match.name;
             newdiv.style.textAlign = "center";
             const idx = Number(input.dataset.idx);
+            sharedObjects.totalGuesses++;
             if (
                 sharedObjects.correctUnits[idx].find(
                     (u) => u.name === match.name && u.country === match.country
@@ -59,18 +60,20 @@ function updateDrowndown(units, input, autoCompL) {
             ) {
                 newdiv.classList.add("match");
                 sharedObjects.guessedUnits.push(match.name, match.country);
+                sharedObjects.correctGuesses++;
+                input.replaceWith(newdiv);
             } else {
-                newdiv.classList.add("fail");
-                sharedObjects.wrongGuesses[index].push(match);
+                input.classList.add("fail");
+                setTimeout(() => {
+                    input.classList.remove("fail");
+                }, 500);
+                sharedObjects.wrongGuesses[input.dataset.idx].push(match);
             }
-            input.replaceWith(newdiv);
-            input.value = match.name;
+            input.value = "";
             autoCompL.innerHTML = "";
             autoCompL.classList.add("hidden");
             sharedObjects.selectedUnit = match;
-            sharedObjects.guesses++;
-            sharedObjects.guessCounter.textContent = `${sharedObjects.guesses}/9`;
-            if (sharedObjects.guesses >= 9) {
+            if (sharedObjects.correctGuesses >= 9) {
                 endGame();
             }
         });
@@ -79,6 +82,17 @@ function updateDrowndown(units, input, autoCompL) {
 }
 
 export function endGame() {
+    const infoBox = document.getElementById("infoBox");
+
+    if (sharedObjects.correctGuesses === 9) {
+        infoBox.className = "success-box";
+        infoBox.textContent = `Well done! 9/9 units guessed in ${sharedObjects.totalGuesses} guesses!`;
+    } else {
+        infoBox.className = "neutral-box";
+        infoBox.color = "#edeae2";
+        infoBox.textContent = `Nice try! ${sharedObjects.correctGuesses}/9 units guessed in ${sharedObjects.totalGuesses} guesses!`;
+    }
+    infoBox.style.display = "block";
     const square = document.getElementById("gameSquare");
 
     for (const key in guessmap) {
@@ -91,9 +105,9 @@ export function endGame() {
         lst.classList.add("squareList");
         lst.classList.add("neutral");
 
-        sharedObjects.wrongGuesses[key].forEach((g) =>
-            sharedObjects.correctUnits[key].push(g)
-        );
+        sharedObjects.wrongGuesses[key].forEach((g) => {
+            sharedObjects.correctUnits[key].push(g);
+        });
         sharedObjects.correctUnits[key].forEach((match) => {
             const div = document.createElement("li");
             const country = sharedObjects.units.find(
@@ -113,7 +127,11 @@ export function endGame() {
 
             if (match.name === higihLightname) {
                 div.classList.add("match");
-            } else if (sharedObjects.wrongGuesses[key].includes(match)) {
+            } else if (
+                sharedObjects.wrongGuesses[key].find(
+                    (u) => u.name === match.name && u.country === match.country
+                )
+            ) {
                 div.classList.add("fail");
 
                 const row = Math.floor(key / 3);
@@ -130,15 +148,15 @@ export function endGame() {
                 );
 
                 if (!inrow && !incol) {
-                    nameSpan.textContent = `\n${match.name}\n 
+                    nameSpan.textContent = `\n${match.name}\n
                     ${colcat.stat} = \n${match[colcat.stat]}\n
                     ${rowcat.stat} = \n${match[rowcat.stat]}\n`;
                 } else if (!incol) {
-                    nameSpan.textContent = `\n${match.name}\n, 
-                    ${colcat.stat} = \n${match[colcat.stat]},`;
+                    nameSpan.textContent = `\n${match.name}\n
+                    ${colcat.stat} = \n${match[colcat.stat]}`;
                 } else if (!inrow) {
-                    nameSpan.textContent = `\n${match.name}\n, 
-                    ${rowcat.stat} = \n${match[rowcat.stat]},`;
+                    nameSpan.textContent = `\n${match.name}\n
+                    ${rowcat.stat} = \n${match[rowcat.stat]}`;
                 }
             }
             div.classList.add("autocomplete-item");
@@ -200,9 +218,10 @@ export function initializeSearchBox(input) {
                 ) {
                     newdiv.classList.add("match");
                     sharedObjects.guessedUnits.push(match.name, match.country);
+                    sharedObjects.correctGuesses++;
                 } else {
                     newdiv.classList.add("fail");
-                    sharedObjects.wrongGuesses[index].push(match);
+                    sharedObjects.wrongGuesses[idx].push(match);
                 }
                 input.replaceWith(newdiv);
                 input.value = match.name;
@@ -210,9 +229,8 @@ export function initializeSearchBox(input) {
                 autoCompL.innerHTML = "";
                 sharedObjects.highlightedIndex = -1;
                 autoCompL.classList.add("hidden");
-                sharedObjects.guesses++;
-                sharedObjects.guessCounter.textContent = `${sharedObjects.guesses}/9`;
-                if (sharedObjects.guesses >= 9) {
+                sharedObjects.guessCounter.textContent = `${sharedObjects.correctGuesses}/9`;
+                if (sharedObjects.correctGuesses >= 9) {
                     endGame();
                 }
             }

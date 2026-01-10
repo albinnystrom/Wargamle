@@ -7,7 +7,6 @@ export function populateGrid() {
     sharedObjects.gamesquare = square;
     const catmap = { 0: 1, 1: 2, 2: 3, 3: 4, 4: 8, 5: 12 };
     sharedObjects.guessCounter = square.children[0];
-    square.children[0].textContent = `${sharedObjects.guesses}/9`;
     for (var key in catmap) {
         const cat = square.children[catmap[key]];
         cat.textContent = sharedObjects.cats[key].toString();

@@ -258,6 +258,19 @@ h1 {
   font-weight: bold;
 }
 
+.neutral-box {
+  background: #f5e37c;
+  color: #776e3c;
+  border: 2px solid #ecd65b;
+  padding: 1rem;
+  margin-top: 1.5rem;
+  border-radius: 0.5rem;
+  font-size: 1.1rem;
+  text-align: center;
+  font-weight: bold;
+}
+
+
 .daily-toggle {
   display: flex;
   align-items: center;
