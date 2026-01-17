@@ -46,6 +46,21 @@ class Category {
         const op = json.ops[rng(json.ops.length)];
         this.op = op;
 
+        if (this.op == "tf") {
+            const tru = rng(2);
+            const negation = tru ? "" : "not";
+            if (tru) {
+                this.inCat = (u) => {
+                    return u[this.stat] === "TRUE";
+                };
+            } else {
+                this.inCat = (u) => {
+                    return u[this.stat] != "TRUE";
+                };
+            }
+            this.toString = () => `Unit is ${negation} ${this.stat}`;
+        }
+
         if (op === "interval") {
             const i = rng(vals.length - 1);
             const j = rng(vals.length - i - 1) + i + 1;
@@ -161,12 +176,68 @@ class Category {
 /* -------------------- Constraints -------------------- */
 
 const MIN_UNITS = 1;
-const COL_MIN = 3;
+const COL_MIN = 4;
 const COL_MAX = 15;
 const MAX_ROW_SIMILARITY = 0.8;
 const MAX_COL_SIMILARITY = 0.8;
 
 /* -------------------- Generator -------------------- */
+
+function overlapWindow(cat) {
+    const n = cat.units.length;
+    if (n <= 15) {
+        return { min: 2, max: 15 };
+    }
+    return { min: 2, max: 12 };
+}
+
+function cellIsRestrictive(rowCat, colCat) {
+    const intersection = rowCat.overlap(colCat);
+    return (
+        intersection > 0 &&
+        intersection < rowCat.units.length &&
+        intersection < colCat.units.length
+    );
+}
+
+function isSolvable(picks) {
+    // Build candidate lists for each cell
+    const cells = [];
+
+    for (let r = 0; r < 3; r++) {
+        for (let c = 0; c < 3; c++) {
+            const rowCat = picks[r + 3];
+            const colCat = picks[c];
+
+            const candidates = rowCat.units.filter((u) =>
+                colCat.unitSet.has(u)
+            );
+
+            if (candidates.length === 0) return false;
+            cells.push(candidates);
+        }
+    }
+
+    // Order cells by fewest candidates (massive speedup)
+    cells.sort((a, b) => a.length - b.length);
+
+    // Backtracking search
+    const used = new Set();
+
+    function dfs(i) {
+        if (i === cells.length) return true;
+
+        for (const u of cells[i]) {
+            if (used.has(u)) continue;
+            used.add(u);
+            if (dfs(i + 1)) return true;
+            used.delete(u);
+        }
+        return false;
+    }
+
+    return dfs(0);
+}
 
 export function getCats(cats) {
     const dailyMode = document.getElementById("dailyToggle").checked;
@@ -212,8 +283,10 @@ export function getCats(cats) {
 
                     //possible units constraints
                     for (let i = 0; i < 3; i++) {
+                        const { min, max } = overlapWindow(cat);
                         const ov = cat.overlap(picks[i]);
-                        if (ov < COL_MIN || ov > COL_MAX) {
+
+                        if (ov < min || ov > max) {
                             ok = false;
                             break;
                         }
@@ -256,6 +329,27 @@ export function getCats(cats) {
         }
 
         if (picks.length === 6) {
+            let valid = true;
+
+            for (let r = 0; r < 3; r++) {
+                for (let c = 0; c < 3; c++) {
+                    const rowCat = picks[r + 3];
+                    const colCat = picks[c];
+
+                    if (!cellIsRestrictive(rowCat, colCat)) {
+                        valid = false;
+                        break;
+                    }
+                }
+                if (!valid) break;
+            }
+
+            if (!valid) continue;
+
+            if (!isSolvable(picks)) {
+                console.log("Rejected unsolvable grid");
+            }
+
             // Check for unnecessary ORs
             for (const p of picks) {
                 if (p.op != "union") continue;
