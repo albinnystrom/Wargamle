@@ -414,6 +414,6 @@ img.flagIcon {
   min-width: 0;
 
   border: 1px solid #ccc;
-  max-height: 120px;
+  max-height: 200px;
   overflow-y: scroll;
 }
