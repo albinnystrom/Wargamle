@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const saved = localStorage.getItem("wgrdle_selected_date");
     const date = saved ? new Date(saved) : new Date();
 
-    fetch("data/units.json")
+    fetch("data/units2.json")
         .then((res) => res.json())
         .then((data) => {
             sharedObjects.units = data.filter((u) => u && u.name);
