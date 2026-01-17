@@ -417,3 +417,15 @@ img.flagIcon {
   max-height: 200px;
   overflow-y: scroll;
 }
+
+.json-tooltip {
+      position: absolute;
+      overflow: auto;
+      padding: 8px;
+      background: #edeae2;
+      border: 1px solid #ccc;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 9999;
+      font-size: 12px;
+      display: none;
+    }

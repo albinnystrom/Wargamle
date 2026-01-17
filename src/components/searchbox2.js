@@ -2,6 +2,7 @@ import { normalizeString } from "../utils/formatting.js";
 import { sharedObjects } from "../shared/squareSharedObjects.js";
 import { filterUnits } from "../utils/filter.js";
 import { guessmap } from "../utils/constants.js";
+import { addHover } from "./unitdisplay.js";
 
 let currentSuggestions = [];
 
@@ -164,7 +165,7 @@ export function endGame() {
             ) {
                 div.classList.add("close");
             }
-            console.log(sharedObjects.guessedUnits);
+            addHover(div, match);
             div.classList.add("autocomplete-item");
             lst.appendChild(div);
         });
