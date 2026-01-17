@@ -147,6 +147,8 @@ with open("rawdata/wgrd.csv") as f1:
                 "weapon3_type": row["Weapon3 Type"],
                 "weapon3": row["Weapon3Name"],
                 "categories": row["Decks"].split("|"),
+                "command": row["Is Command"],
+                "amphibious": row["Amphibious"],
             }
             for k, v in data.items():
                 if v == "":
