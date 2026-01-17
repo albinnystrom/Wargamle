@@ -134,31 +134,6 @@ export function endGame() {
                 )
             ) {
                 div.classList.add("fail");
-
-                const row = Math.floor(key / 3);
-                const col = key % 3;
-
-                const rowcat = sharedObjects.cats[row + 3];
-                const colcat = sharedObjects.cats[col];
-
-                const inrow = rowcat.units.find(
-                    (u) => u.name === match.name && u.country === match.country
-                );
-                const incol = colcat.units.find(
-                    (u) => u.name === match.name && u.country === match.country
-                );
-
-                if (!inrow && !incol) {
-                    nameSpan.textContent = `\n${match.name}\n
-                    ${colcat.stat} = \n${match[colcat.stat]}\n
-                    ${rowcat.stat} = \n${match[rowcat.stat]}\n`;
-                } else if (!incol) {
-                    nameSpan.textContent = `\n${match.name}\n
-                    ${colcat.stat} = \n${match[colcat.stat]}`;
-                } else if (!inrow) {
-                    nameSpan.textContent = `\n${match.name}\n
-                    ${rowcat.stat} = \n${match[rowcat.stat]}`;
-                }
             } else if (
                 sharedObjects.guessedUnits.includes(match.name) &&
                 sharedObjects.guessedUnits.includes(match.country)

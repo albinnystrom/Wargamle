@@ -1,7 +1,6 @@
 import { parseGuess } from "../utils/formatting.js";
 
 export function addHover(div, unit) {
-    div.classList.add("neutral");
     const data = Object.fromEntries(
         Object.entries(unit).map(([k, v]) => [k, parseGuess(v)])
     );
