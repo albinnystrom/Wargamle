@@ -158,7 +158,13 @@ export function endGame() {
                     nameSpan.textContent = `\n${match.name}\n
                     ${rowcat.stat} = \n${match[rowcat.stat]}`;
                 }
+            } else if (
+                sharedObjects.guessedUnits.includes(match.name) &&
+                sharedObjects.guessedUnits.includes(match.country)
+            ) {
+                div.classList.add("close");
             }
+            console.log(sharedObjects.guessedUnits);
             div.classList.add("autocomplete-item");
             lst.appendChild(div);
         });
