@@ -144,11 +144,25 @@ export function updateSummaryVals(td, key, guessUnit, isClose) {
     if (isClose) {
         rng = getClose(key, guessVal);
     } else {
-        let lwr = getClose(key, getClose(key, guessVal)[1])[1];
-        let upr = getClose(key, getClose(key, guessVal)[0])[0];
-        rng = [lwr, upr];
-    }
+        let lwr, upr;
+        console.log(":))");
+        if (key == "price") {
+            let lwr1 = getClose(key, guessVal)[1];
+            let upr1 = getClose(key, guessVal)[0];
+            lwr = getClose(key, lwr1)[1];
+            upr = getClose(key, upr1)[0];
+            if (lwr - lwr1 > 5) lwr -= 5;
+            if (upr1 - upr > 5) upr += 5;
 
+            console.log(`${lwr}, ${lwr1}`);
+            console.log("hej");
+        } else {
+            lwr = getClose(key, getClose(key, guessVal)[1])[1];
+            upr = getClose(key, getClose(key, guessVal)[0])[0];
+        }
+        rng = [lwr, upr];
+        if (key == "price") console.log(rng);
+    }
     //lower bound
     if (
         (compareVals(key, rng[0], summaryVals[key][0]) || //if bigger than current
