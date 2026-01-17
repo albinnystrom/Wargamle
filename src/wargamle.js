@@ -12,6 +12,16 @@ import { initializeTable } from "./components/resultTable.js";
 import { isNavalDate } from "./utils/constants.js";
 
 document.addEventListener("DOMContentLoaded", () => {
+    const popup = document.getElementById("popup");
+    if (!localStorage.getItem("popupclosed2")) {
+        popup.classList.add("active");
+    }
+    const closePopup = document.getElementById("closePopup");
+
+    closePopup.onclick = () => {
+        popup.classList.remove("active");
+        localStorage.setItem("popupclosed2", true);
+    };
     const toggle = document.getElementById("dailyToggle");
     const savedState = localStorage.getItem("wgrdle_toggle_state");
     toggle.checked = savedState !== "off";
