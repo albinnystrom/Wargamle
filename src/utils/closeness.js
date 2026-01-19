@@ -25,7 +25,7 @@ export function getClose(key, guessVal) {
 
     if (key == "price") {
         return [
-            guessVal <= 55 ? guessVal - 5 : guessVal - 10,
+            guessVal <= 50 ? guessVal - 5 : guessVal - 10,
             guessVal <= 50 ? guessVal + 5 : guessVal + 10,
         ];
     }
