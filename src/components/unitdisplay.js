@@ -2,7 +2,7 @@ import { parseGuess } from "../utils/formatting.js";
 
 export function addHover(div, unit) {
     const data = Object.fromEntries(
-        Object.entries(unit).map(([k, v]) => [k, parseGuess(v)])
+        Object.entries(unit).map(([k, v]) => [k, parseGuess(v)]),
     );
 
     let tooltip;
@@ -48,19 +48,16 @@ export function addHover(div, unit) {
 
         const tooltipRect = tooltip.getBoundingClientRect();
         const viewportWidth = window.innerWidth;
-        const viewportHeight = window.innerHeight;
+        const viewportHeight = window.innerHeight * 0.9;
 
         let top;
         let left;
 
-        // Vertical positioning: below or above
-        if (e.clientY + margin + tooltipRect.height <= viewportHeight) {
-            // Enough space below
-            top = e.clientY + margin;
-        } else {
-            // Place above
-            top = e.clientY - margin - tooltipRect.height;
-        }
+        // Place above
+        top = e.clientY - margin - tooltipRect.height;
+        top =
+            e.clientY +
+            Math.min(0, viewportHeight - (e.clientY + tooltipRect.height));
 
         // Horizontal positioning: clamp within viewport
         left = e.clientX + margin;
