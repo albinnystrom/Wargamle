@@ -62,11 +62,13 @@ class Category {
         }
 
         if (op === "interval") {
-            const i = rng(vals.length - 1);
-            const j = rng(vals.length - i - 1) + i + 1;
+            do {
+                const i = rng(vals.length - 1);
+                const j = rng(vals.length - i - 1) + i + 1;
 
-            this.lower = vals[i];
-            this.upper = vals[j];
+                this.lower = vals[i];
+                this.upper = vals[j];
+            } while (this.upper - this.lower < json.interval_size);
 
             if (this.scale === "ratio") {
                 this.inCat = (u) => {
@@ -106,7 +108,9 @@ class Category {
         } else if (op === "gtlt") {
             if (rng(2)) {
                 this.op = "lt";
-                this.compval = vals[rng(vals.length - 1) + 1];
+                do {
+                    this.compval = vals[rng(vals.length - 1) + 1];
+                } while (this.compval - vals[0] < json.interval_size);
                 if (this.scale === "ratio") {
                     this.inCat = (u) => parseGuess(u[this.stat]) < this.compval;
                 } else if (this.scale === "ordinal") {
@@ -127,7 +131,12 @@ class Category {
                 this.toString = () => `${this.stat} < ${this.compval}`;
             } else {
                 this.op = "gt";
-                this.compval = vals[rng(vals.length - 1)];
+                do {
+                    this.compval = vals[rng(vals.length - 1)];
+                } while (
+                    vals[vals.length - 1] - this.compval <
+                    json.interval_size
+                );
                 if (this.scale === "ratio") {
                     this.inCat = (u) => parseGuess(u[this.stat]) > this.compval;
                 } else if (this.scale === "ordinal") {
