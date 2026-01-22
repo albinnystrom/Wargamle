@@ -248,6 +248,26 @@ function isSolvable(picks) {
     return dfs(0);
 }
 
+function countHeloCells(picks) {
+    let count = 0;
+
+    for (let r = 0; r < 3; r++) {
+        for (let c = 0; c < 3; c++) {
+            const units = picks[r + 3].units.filter((u) =>
+                picks[c].unitSet.has(u)
+            );
+
+            if (
+                units.length > 0 &&
+                units.every((u) => u.speed >= 180 && u.speed <= 350)
+            ) {
+                count++;
+            }
+        }
+    }
+    return count;
+}
+
 export function getCats(cats) {
     const dailyMode = document.getElementById("dailyToggle").checked;
 
@@ -357,7 +377,10 @@ export function getCats(cats) {
 
             if (!isSolvable(picks)) {
                 console.log("Rejected unsolvable grid");
+                continue;
             }
+
+            if (countHeloCells(picks) > 3) continue;
 
             // Check for unnecessary ORs
             for (const p of picks) {
