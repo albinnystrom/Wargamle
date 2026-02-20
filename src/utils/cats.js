@@ -386,8 +386,20 @@ export function getCats(cats) {
 
             if (countHeloCells(picks) > 3) continue;
 
+            // Populate correctUnits
+            for (let i = 0; i < 9; i++) {
+                const row = Math.floor(i / 3);
+                const col = i % 3;
+                sharedObjects.correctUnits[i] = sharedObjects.units.filter(
+                    (u) =>
+                        picks[row + 3].units.includes(u) &&
+                        picks[col].units.includes(u),
+                );
+            }
+
             // Check for unnecessary ORs
-            for (const p of picks) {
+            for (let i = 0; i < 6; i++) {
+                const p = picks[i];
                 if (p.op != "union") continue;
 
                 const fst = sharedObjects.units.filter(
@@ -399,20 +411,38 @@ export function getCats(cats) {
 
                 if (fst.length === 0) {
                     p.toString = () => `${p.stat} = ${p.second}`;
+                    continue;
                 } else if (snd.length === 0) {
                     p.toString = () => `${p.stat} = ${p.first}`;
+                    continue;
                 }
-            }
 
-            // Populate correctUnits
-            for (let i = 0; i < 9; i++) {
-                const row = Math.floor(i / 3);
-                const col = i % 3;
-                sharedObjects.correctUnits[i] = sharedObjects.units.filter(
-                    (u) =>
-                        picks[row + 3].units.includes(u) &&
-                        picks[col].units.includes(u),
+                let squares = [];
+                if (i < 3) {
+                    squares = [0 + (i % 3), 3 + (i % 3), 6 + (i % 3)];
+                } else {
+                    squares = [
+                        0 + (i % 3) * 3,
+                        1 + (i % 3) * 3,
+                        2 + (i % 3) * 3,
+                    ];
+                }
+                const no_fst = !squares.some((s) =>
+                    sharedObjects.correctUnits[s].some(
+                        (u) => u[p.stat] === p.first,
+                    ),
                 );
+                const no_snd = !squares.some((s) =>
+                    sharedObjects.correctUnits[s].some(
+                        (u) => u[p.stat] === p.second,
+                    ),
+                );
+
+                if (no_fst) {
+                    p.toString = () => `${p.stat} = ${p.second}`;
+                } else if (no_snd) {
+                    p.toString = () => `${p.stat} = ${p.first}`;
+                }
             }
             debugOutput(picks);
             return picks;
