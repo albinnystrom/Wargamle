@@ -46,7 +46,13 @@ class Category {
         const op = json.ops[rng(json.ops.length)];
         this.op = op;
 
-        if (this.op == "tf") {
+        if (this.stat === "coalition" || this.stat === "tab") {
+            this.val = vals[rng(vals.length)];
+            this.inCat = (u) => {
+                return u[this.stat].includes(this.val);
+            };
+            this.toString = () => `Unit is in ${this.stat} ${this.val}`;
+        } else if (op === "tf") {
             const tru = rng(2);
             const negation = tru ? "" : "not";
             if (tru) {
@@ -59,9 +65,7 @@ class Category {
                 };
             }
             this.toString = () => `Unit is ${negation} ${this.stat}`;
-        }
-
-        if (op === "interval") {
+        } else if (op === "interval") {
             do {
                 const i = rng(vals.length - 1);
                 const j = rng(vals.length - i - 1) + i + 1;
@@ -84,7 +88,7 @@ class Category {
                 };
             } else {
                 throw new Error(
-                    `Category op: ${this.op} doesn't support scale ${this.scale})`
+                    `Category op: ${this.op} doesn't support scale ${this.scale})`,
                 );
             }
 
@@ -116,16 +120,16 @@ class Category {
                 } else if (this.scale === "ordinal") {
                     this.inCat = (u) => {
                         const stt = closenessSets()[this.stat].indexOf(
-                            u[this.stat]
+                            u[this.stat],
                         );
                         const cmp = closenessSets()[this.stat].indexOf(
-                            this.compval
+                            this.compval,
                         );
                         return stt < cmp;
                     };
                 } else {
                     throw new Error(
-                        `Category op: ${this.op} doesn't support scale ${this.scale})`
+                        `Category op: ${this.op} doesn't support scale ${this.scale})`,
                     );
                 }
                 this.toString = () => `${this.stat} < ${this.compval}`;
@@ -142,16 +146,16 @@ class Category {
                 } else if (this.scale === "ordinal") {
                     this.inCat = (u) => {
                         const stt = closenessSets()[this.stat].indexOf(
-                            u[this.stat]
+                            u[this.stat],
                         );
                         const cmp = closenessSets()[this.stat].indexOf(
-                            this.compval
+                            this.compval,
                         );
                         return stt > cmp;
                     };
                 } else {
                     throw new Error(
-                        `Category op: ${this.op} doesn't support scale ${this.scale})`
+                        `Category op: ${this.op} doesn't support scale ${this.scale})`,
                     );
                 }
                 this.toString = () => `${this.stat} > ${this.compval}`;
@@ -185,8 +189,8 @@ class Category {
 /* -------------------- Constraints -------------------- */
 
 const MIN_UNITS = 1;
-const COL_MIN = 4;
-const COL_MAX = 15;
+// const COL_MIN = 4;
+// const COL_MAX = 15;
 const MAX_ROW_SIMILARITY = 0.8;
 const MAX_COL_SIMILARITY = 0.8;
 
@@ -219,7 +223,7 @@ function isSolvable(picks) {
             const colCat = picks[c];
 
             const candidates = rowCat.units.filter((u) =>
-                colCat.unitSet.has(u)
+                colCat.unitSet.has(u),
             );
 
             if (candidates.length === 0) return false;
@@ -254,7 +258,7 @@ function countHeloCells(picks) {
     for (let r = 0; r < 3; r++) {
         for (let c = 0; c < 3; c++) {
             const units = picks[r + 3].units.filter((u) =>
-                picks[c].unitSet.has(u)
+                picks[c].unitSet.has(u),
             );
 
             if (
@@ -387,10 +391,10 @@ export function getCats(cats) {
                 if (p.op != "union") continue;
 
                 const fst = sharedObjects.units.filter(
-                    (u) => u[p.stat] === p.first
+                    (u) => u[p.stat] === p.first,
                 );
                 const snd = sharedObjects.units.filter(
-                    (u) => u[p.stat] === p.second
+                    (u) => u[p.stat] === p.second,
                 );
 
                 if (fst.length === 0) {
@@ -407,7 +411,7 @@ export function getCats(cats) {
                 sharedObjects.correctUnits[i] = sharedObjects.units.filter(
                     (u) =>
                         picks[row + 3].units.includes(u) &&
-                        picks[col].units.includes(u)
+                        picks[col].units.includes(u),
                 );
             }
             debugOutput(picks);
@@ -424,12 +428,12 @@ function debugOutput(catPicks) {
     for (let i = 0; i < 3; i++) {
         for (let j = 3; j < 6; j++) {
             console.log(
-                `${catPicks[i].toString()} AND ${catPicks[j].toString()}`
+                `${catPicks[i].toString()} AND ${catPicks[j].toString()}`,
             );
             console.log(
                 catPicks[i].units
                     .filter((u) => catPicks[j].unitSet.has(u))
-                    .map((u) => u.name)
+                    .map((u) => u.name),
             );
         }
     }
