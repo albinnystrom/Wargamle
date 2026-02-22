@@ -401,6 +401,7 @@ export function getCats(cats) {
             for (let i = 0; i < 6; i++) {
                 const p = picks[i];
                 if (p.op != "union") continue;
+                if (p.stat === "coalition" || p.stat === "tab") continue;
 
                 const fst = sharedObjects.units.filter(
                     (u) => u[p.stat] === p.first,
